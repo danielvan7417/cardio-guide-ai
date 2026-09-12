@@ -150,7 +150,7 @@ function Dashboard() {
           </div>
           <div className="mt-5 flex h-32 items-end gap-2 sm:gap-4">
             {tendencia.map((d) => (
-              <div key={d.dia} className="flex flex-1 flex-col items-center gap-2">
+              <div key={d.dia} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
                 <div
                   className={`w-full rounded-t-lg ${d.alto ? "bg-warn/50" : "bg-brand/35"}`}
                   style={{ height: `${d.valor}%` }}
