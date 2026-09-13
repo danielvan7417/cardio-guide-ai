@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
+import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { mediciones } from "@/lib/ritmo";
+
 import { useSesion } from "@/lib/sesion";
 
 export const Route = createFileRoute("/mediciones")({
@@ -28,6 +30,7 @@ const FILTROS = ["Todas", "Reposo", "Ejercicio", "Estrés"] as const;
 
 function Mediciones() {
   const { sesion } = useSesion();
+  const dispositivo = useDispositivo();
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>("Todas");
   if (!sesion) return null;
 
@@ -39,12 +42,25 @@ function Mediciones() {
       sesion={sesion}
       titulo="Historial de mediciones"
       migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Mediciones" }]}
+      acciones={
+        <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
+      }
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <Etiqueta>Última traza registrada</Etiqueta>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Etiqueta>Traza en vivo del sensor</Etiqueta>
+            <span className="font-display text-lg font-semibold">
+              {dispositivo.bpm} <span className="text-[12px] text-ink/50">BPM</span>
+            </span>
+          </div>
           <div className="mt-4">
-            <Onda alto="h-24" />
+            <Onda
+              alto="h-24"
+              muestras={dispositivo.muestras}
+              activa={dispositivo.enVivo || dispositivo.simulacion}
+              alerta={dispositivo.alertaActiva}
+            />
           </div>
         </Card>
         <Card className="flex flex-col justify-center gap-2">
@@ -55,6 +71,7 @@ function Mediciones() {
           <p className="text-sm text-ink/60">{lista.length} lecturas mostradas</p>
         </Card>
       </section>
+
 
       <div className="mt-5 flex flex-wrap gap-2">
         {FILTROS.map((f) => (

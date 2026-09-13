@@ -34,15 +34,17 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   const { sesion } = useSesion();
-  const [bpm, setBpm] = useState(72);
+  const dispositivo = useDispositivo();
   const [mensaje, setMensaje] = useState("¿Puedo trotar hoy?");
   const [respuesta, setRespuesta] = useState<RespuestaAsistente | null>(null);
   const [cargando, setCargando] = useState(false);
   const [errorApi, setErrorApi] = useState("");
+  const [verSimulador, setVerSimulador] = useState(false);
 
   if (!sesion) return null;
   const imc = imcDe(sesion);
-  const elevado = bpm >= UMBRAL_BPM;
+  const bpm = dispositivo.bpm;
+  const elevado = dispositivo.alertaActiva;
 
   const preguntar = async () => {
     setCargando(true);
@@ -65,12 +67,18 @@ function Dashboard() {
       titulo={`Buenos días, ${sesion.nombre.split(" ")[0]}`}
       migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Panel de monitoreo" }]}
       acciones={
-        <Link
-          to="/sintomas"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand px-3 py-2 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
-        >
-          <span className="text-[13px]">＋</span> Nueva medición
-        </Link>
+        <>
+          <IndicadorDispositivo
+            estado={dispositivo.estado}
+            ultimaTrama={dispositivo.ultimaTrama}
+          />
+          <Link
+            to="/sintomas"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand px-3 py-2 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
+          >
+            <span className="text-[13px]">＋</span> Nueva medición
+          </Link>
+        </>
       }
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
@@ -81,7 +89,9 @@ function Dashboard() {
                 <span
                   className={`rv-pulse size-2 rounded-full ${elevado ? "bg-warn" : "bg-ok"}`}
                 />
-                <Etiqueta>Ritmo en tiempo real</Etiqueta>
+                <Etiqueta>
+                  {dispositivo.enVivo ? "Ritmo en vivo · sensor ESP32" : "Ritmo en tiempo real"}
+                </Etiqueta>
               </div>
               <div className="mt-2 flex items-end gap-3">
                 <span className="rv-pulse font-display text-5xl font-semibold leading-none">
@@ -89,6 +99,11 @@ function Dashboard() {
                 </span>
                 <span className="mb-1.5 text-sm text-ink/55">BPM</span>
               </div>
+              <p className="mt-1 text-[12px] text-ink/50">
+                {dispositivo.ultimaTrama
+                  ? `Última trama recibida ${dispositivo.ultimaTrama}`
+                  : "Esperando tramas del microcontrolador…"}
+              </p>
             </div>
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 ${
@@ -100,26 +115,67 @@ function Dashboard() {
           </div>
 
           <div className="mt-5">
-            <Onda />
+            <Onda
+              muestras={dispositivo.muestras}
+              activa={dispositivo.enVivo || dispositivo.simulacion}
+              alerta={elevado}
+            />
           </div>
 
-          <label className="mt-4 block">
-            <span className="text-[12px] text-ink/55">
-              Simular sensor · umbral seguro {UMBRAL_BPM} BPM
-            </span>
-            <input
-              type="range"
-              min={45}
-              max={185}
-              value={bpm}
-              onChange={(e) => setBpm(Number(e.target.value))}
-              className="mt-2 w-full accent-[var(--brand)]"
-              aria-label="Frecuencia cardíaca simulada"
-            />
-          </label>
+          {elevado && (
+            <p className="mt-4 rounded-xl bg-warn/10 px-4 py-3 text-[13px] text-ink ring-1 ring-warn/25">
+              <span className="font-semibold text-warn">Regla de seguridad activada:</span> el
+              sensor reporta {bpm} BPM, por encima del umbral de {UMBRAL_BPM} BPM. Detén la
+              actividad y consulta al asistente.
+            </p>
+          )}
+
+          <div className="mt-4 rounded-xl bg-panel/50 p-3 ring-1 ring-ink/5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[12px] text-ink/60">
+                Modo de simulación avanzada (solo pruebas sin hardware)
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const activar = !dispositivo.simulacion;
+                    dispositivo.activarSimulacion(activar);
+                    setVerSimulador(activar);
+                  }}
+                  className={`rounded-lg px-3 py-1.5 text-[12px] font-medium ring-1 ${
+                    dispositivo.simulacion
+                      ? "bg-brand text-brand-foreground ring-brand/40"
+                      : "bg-panel/70 text-ink/70 ring-ink/5 hover:bg-panel"
+                  }`}
+                >
+                  {dispositivo.simulacion ? "Simulación activa" : "Activar simulación"}
+                </button>
+              </div>
+            </div>
+            {verSimulador && dispositivo.simulacion && (
+              <label className="mt-3 block">
+                <span className="text-[12px] text-ink/55">
+                  BPM simulado · umbral seguro {UMBRAL_BPM} BPM
+                </span>
+                <input
+                  type="range"
+                  min={45}
+                  max={185}
+                  value={dispositivo.bpmSimulado}
+                  onChange={(e) => dispositivo.setBpmSimulado(Number(e.target.value))}
+                  className="mt-2 w-full accent-[var(--brand)]"
+                  aria-label="Frecuencia cardíaca simulada"
+                />
+              </label>
+            )}
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {["Reposo", `Frecuencia ${bpm}`, `IMC ${imc}`].map((t) => (
+            {[
+              dispositivo.simulacion ? "Fuente: simulador" : "Fuente: ESP32",
+              `Frecuencia ${bpm}`,
+              `IMC ${imc}`,
+            ].map((t) => (
               <span
                 key={t}
                 className="rounded-lg bg-panel/70 px-2.5 py-1 text-[11px] text-ink/60 ring-1 ring-ink/5"
@@ -129,6 +185,7 @@ function Dashboard() {
             ))}
           </div>
         </Card>
+
 
         <Card className="flex flex-col gap-4">
           <Etiqueta>Lectura rápida</Etiqueta>
