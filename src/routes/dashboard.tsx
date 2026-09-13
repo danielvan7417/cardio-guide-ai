@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
+import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { imcDe, useSesion } from "@/lib/sesion";
 import {
   consultarAsistente,
@@ -10,6 +11,7 @@ import {
   UMBRAL_BPM,
   type RespuestaAsistente,
 } from "@/lib/ritmo";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
