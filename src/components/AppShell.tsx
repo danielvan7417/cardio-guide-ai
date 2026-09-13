@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cerrarSesion, type Sesion } from "@/lib/sesion";
 
 type NavItem = { to: string; label: string; icon: string };
@@ -12,6 +12,8 @@ const NAV: NavItem[] = [
   { to: "/reportes", label: "Reportes", icon: "▦" },
   { to: "/perfil", label: "Perfil", icon: "◐" },
 ];
+
+const CLAVE_SIDEBAR = "ritmovital:sidebar";
 
 export function AppShell({
   sesion,
@@ -29,26 +31,43 @@ export function AppShell({
   const router = useRouter();
   const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [colapsada, setColapsada] = useState(false);
+
+  useEffect(() => {
+    setColapsada(localStorage.getItem(CLAVE_SIDEBAR) === "1");
+  }, []);
+
+  const alternarSidebar = () => {
+    setColapsada((v) => {
+      localStorage.setItem(CLAVE_SIDEBAR, v ? "0" : "1");
+      return !v;
+    });
+  };
 
   const salir = () => {
     cerrarSesion();
     navigate({ to: "/", replace: true });
   };
 
-  const enlaces = (
+  const enlaces = (mini = false) => (
     <nav className="flex flex-col gap-1">
       {NAV.map((item) => (
         <Link
           key={item.to}
           to={item.to}
+          title={item.label}
           onClick={() => setMenuAbierto(false)}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink/70 transition-colors hover:bg-panel/50"
+          className={`flex items-center gap-3 rounded-xl py-2.5 text-sm text-ink/70 transition-colors hover:bg-panel/50 ${
+            mini ? "justify-center px-0" : "px-3"
+          }`}
           activeProps={{
-            className:
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium bg-panel/70 text-brand ring-1 ring-brand/15",
+            className: `flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium bg-panel/70 text-brand ring-1 ring-brand/15 ${
+              mini ? "justify-center px-0" : "px-3"
+            }`,
           }}
         >
-          <span className="text-[13px]">{item.icon}</span> {item.label}
+          <span className="text-[13px]">{item.icon}</span>
+          {!mini && item.label}
         </Link>
       ))}
     </nav>
@@ -57,22 +76,49 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-surface text-ink">
       <div className="mx-auto flex max-w-[1500px]">
-        <aside className="glass-soft sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-5 border-r border-panel/60 p-5 lg:flex">
-          <Marca />
-          <div className="mt-2">{enlaces}</div>
-          <div className="mt-auto rounded-2xl bg-panel/50 p-4 ring-1 ring-ink/5">
-            <p className="text-[11px] uppercase tracking-[0.12em] text-ink/45">Sesión</p>
-            <p className="mt-1 font-display text-sm font-medium">{sesion.nombre}</p>
-            <p className="text-[11px] text-ink/50">
-              Tipo {sesion.tipoSangre} · {sesion.edad} años
-            </p>
+        <aside
+          className={`glass-soft sticky top-0 hidden h-screen shrink-0 flex-col gap-5 overflow-hidden border-r border-panel/60 p-4 transition-[width] duration-300 ease-out lg:flex ${
+            colapsada ? "w-[76px]" : "w-64"
+          }`}
+        >
+          <div
+            className={`flex items-center gap-2 ${colapsada ? "justify-center" : "justify-between"}`}
+          >
+            {!colapsada && <Marca />}
             <button
-              onClick={salir}
-              className="mt-3 w-full rounded-lg bg-panel/70 px-3 py-2 text-[12px] font-medium text-ink/70 ring-1 ring-ink/5 hover:bg-panel"
+              onClick={alternarSidebar}
+              aria-expanded={!colapsada}
+              aria-label={colapsada ? "Expandir menú lateral" : "Contraer menú lateral"}
+              className="grid size-9 shrink-0 place-items-center rounded-xl bg-panel/70 text-sm text-ink/70 ring-1 ring-ink/5 transition-colors hover:bg-panel"
             >
-              Cerrar sesión
+              ☰
             </button>
           </div>
+          <div className="mt-1">{enlaces(colapsada)}</div>
+          {colapsada ? (
+            <button
+              onClick={salir}
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+              className="mt-auto grid size-9 place-items-center self-center rounded-xl bg-panel/70 text-sm text-ink/70 ring-1 ring-ink/5 hover:bg-panel"
+            >
+              ⏻
+            </button>
+          ) : (
+            <div className="mt-auto rounded-2xl bg-panel/50 p-4 ring-1 ring-ink/5">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-ink/45">Sesión</p>
+              <p className="mt-1 font-display text-sm font-medium">{sesion.nombre}</p>
+              <p className="text-[11px] text-ink/50">
+                Tipo {sesion.tipoSangre} · {sesion.edad} años
+              </p>
+              <button
+                onClick={salir}
+                className="mt-3 w-full rounded-lg bg-panel/70 px-3 py-2 text-[12px] font-medium text-ink/70 ring-1 ring-ink/5 hover:bg-panel"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          )}
         </aside>
 
         <main className="min-w-0 flex-1 p-4 sm:p-8">
@@ -88,7 +134,7 @@ export function AppShell({
           </div>
           {menuAbierto && (
             <div className="glass mb-4 rounded-2xl p-3 ring-1 ring-ink/5 lg:hidden">
-              {enlaces}
+              {enlaces()}
               <button
                 onClick={salir}
                 className="mt-2 w-full rounded-lg bg-panel/70 px-3 py-2 text-[12px] font-medium text-ink/70 ring-1 ring-ink/5"
@@ -97,6 +143,7 @@ export function AppShell({
               </button>
             </div>
           )}
+
 
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
