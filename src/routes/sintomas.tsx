@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
-import { estadoDe, type RegistroSintoma } from "@/lib/ritmo";
+import { estadoDe } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
 import { useSintomas } from "@/lib/datos";
 
@@ -35,25 +35,6 @@ function Sintomas() {
   const [nota, setNota] = useState("");
   const { lista: bitacora, agregar } = useSintomas(sesion?.id);
   const [errorGuardar, setErrorGuardar] = useState("");
-  const _demo: RegistroSintoma[] = ([
-    {
-      id: "s1",
-      fecha: "Hoy · 07:30",
-      bpm: 135,
-      contexto: "Ejercicio",
-      sintomas: ["Mareo", "Fatiga"],
-      nota: "Sensación de falta de aire al finalizar el trote.",
-    },
-    {
-      id: "s2",
-      fecha: "Ayer · 21:10",
-      bpm: 76,
-      contexto: "Reposo",
-      sintomas: ["Ninguno"],
-      nota: "Noche tranquila, sin molestias.",
-    },
-  ]);
-  void _demo;
 
   if (!sesion) return null;
 
