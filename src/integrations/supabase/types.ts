@@ -14,7 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      mediciones: {
+        Row: {
+          bpm: number
+          contexto: string
+          created_at: string
+          id: string
+          origen: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          bpm: number
+          contexto?: string
+          created_at?: string
+          id?: string
+          origen?: string
+          titulo?: string
+          user_id: string
+        }
+        Update: {
+          bpm?: number
+          contexto?: string
+          created_at?: string
+          id?: string
+          origen?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          consentimiento: boolean
+          correo: string
+          created_at: string
+          edad: number
+          estatura: number
+          id: string
+          nombre: string
+          peso: number
+          tipo_sangre: string
+          updated_at: string
+        }
+        Insert: {
+          consentimiento?: boolean
+          correo?: string
+          created_at?: string
+          edad?: number
+          estatura?: number
+          id: string
+          nombre?: string
+          peso?: number
+          tipo_sangre?: string
+          updated_at?: string
+        }
+        Update: {
+          consentimiento?: boolean
+          correo?: string
+          created_at?: string
+          edad?: number
+          estatura?: number
+          id?: string
+          nombre?: string
+          peso?: number
+          tipo_sangre?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sintomas: {
+        Row: {
+          bpm: number
+          contexto: string
+          created_at: string
+          id: string
+          nota: string
+          sintomas: string[]
+          user_id: string
+        }
+        Insert: {
+          bpm: number
+          contexto?: string
+          created_at?: string
+          id?: string
+          nota?: string
+          sintomas?: string[]
+          user_id: string
+        }
+        Update: {
+          bpm?: number
+          contexto?: string
+          created_at?: string
+          id?: string
+          nota?: string
+          sintomas?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
