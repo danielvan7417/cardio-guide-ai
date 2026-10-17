@@ -82,7 +82,7 @@ function Sintomas() {
     <AppShell
       sesion={sesion}
       titulo="Mapeo y diario de síntomas"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Síntomas" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud", to: "/sintomas" }, { label: "Registro de Síntomas" }]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">

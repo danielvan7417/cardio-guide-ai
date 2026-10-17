@@ -51,7 +51,7 @@ function Perfil() {
     <AppShell
       sesion={sesion}
       titulo="Gestión de perfil"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Perfil" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Configuración", to: "/perfil" }, { label: "Perfil de Usuario" }]}
     >
       <form onSubmit={enviar} className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">

@@ -41,7 +41,7 @@ function Mediciones() {
     <AppShell
       sesion={sesion}
       titulo="Historial de mediciones"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Mediciones" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/dashboard" }, { label: "Historial de Mediciones" }]}
       acciones={
         <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
       }

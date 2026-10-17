@@ -41,6 +41,9 @@
   /* RitmoVital semantic tokens */
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
+  --color-volver: var(--volver);
+  --color-volver-hover: var(--volver-hover);
+  --color-volver-foreground: var(--volver-foreground);
   --color-ink: var(--ink);
   --color-surface: var(--surface);
   --color-soft: var(--soft);
@@ -58,6 +61,9 @@
 
   --brand: oklch(0.532 0.069 232.5);
   --brand-foreground: oklch(0.99 0 0);
+  --volver: oklch(0.685 0.169 237.3);
+  --volver-hover: oklch(0.588 0.158 241.9);
+  --volver-foreground: oklch(0.99 0 0);
   --ink: oklch(0.298 0.018 245);
   --surface: oklch(0.936 0.006 250);
   --soft: oklch(0.965 0.004 250);
