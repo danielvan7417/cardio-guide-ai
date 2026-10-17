@@ -210,7 +210,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <div className={`glass rounded-[20px] p-5 ring-1 ring-ink/5 sm:p-6 ${className}`}>
+    <div className={`glass rounded-[20px] p-5 ring-1 ring-ink/5 sm:p-6 2xl:p-8 ${className}`}>
       {children}
     </div>
   );
