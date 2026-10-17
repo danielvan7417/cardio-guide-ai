@@ -121,7 +121,7 @@ export function AppShell({
           )}
         </aside>
 
-        <main className="min-w-0 flex-1 p-4 sm:p-6 xl:p-8 2xl:p-10 2xl:text-[1.05rem]">
+        <main className="min-w-0 flex-1 p-4 sm:p-5 lg:p-6 xl:p-7 2xl:p-8 2xl:text-[1.05rem]">
           <div className="mb-4 flex items-center justify-between lg:hidden">
             <Marca />
             <button
@@ -168,7 +168,7 @@ export function AppShell({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.history.back()}
-                className="inline-flex items-center gap-2 rounded-xl bg-volver py-2 pl-3 pr-4 text-sm font-medium text-volver-foreground shadow-sm ring-1 ring-volver-hover/40 transition-colors hover:bg-volver-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-volver-hover"
+                className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               >
                 <span className="text-[13px]">←</span> Volver
               </button>
