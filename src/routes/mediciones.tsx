@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
-import { mediciones } from "@/lib/ritmo";
+import { useMediciones } from "@/lib/datos";
 
 import { useSesion } from "@/lib/sesion";
 
@@ -32,7 +32,30 @@ function Mediciones() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>("Todas");
+  const { lista: mediciones, agregar } = useMediciones(sesion?.id);
+  const [titulo, setTitulo] = useState("");
+  const [nuevoBpm, setNuevoBpm] = useState(72);
+  const [nuevoCtx, setNuevoCtx] = useState<"Reposo" | "Ejercicio" | "Estrés">("Reposo");
+  const [aviso, setAviso] = useState("");
   if (!sesion) return null;
+
+  const guardar = async (e: React.FormEvent, desdeSensor = false) => {
+    e.preventDefault();
+    const bpmFinal = desdeSensor ? dispositivo.bpm : nuevoBpm;
+    if (!bpmFinal || bpmFinal < 30 || bpmFinal > 230) return setAviso("Pulso fuera de rango (30–230).");
+    try {
+      await agregar({
+        titulo: titulo.trim() || (desdeSensor ? "Lectura del sensor ESP32" : "Medición manual"),
+        bpm: bpmFinal,
+        contexto: nuevoCtx,
+        origen: desdeSensor ? "esp32" : "manual",
+      });
+      setTitulo("");
+      setAviso("Medición guardada.");
+    } catch {
+      setAviso("No se pudo guardar la medición.");
+    }
+  };
 
   const lista = mediciones.filter((m) => filtro === "Todas" || m.contexto === filtro);
   const promedio = Math.round(lista.reduce((a, m) => a + m.bpm, 0) / (lista.length || 1));
@@ -41,7 +64,7 @@ function Mediciones() {
     <AppShell
       sesion={sesion}
       titulo="Historial de mediciones"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Mediciones" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/dashboard" }, { label: "Historial de Mediciones" }]}
       acciones={
         <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
       }
@@ -72,6 +95,48 @@ function Mediciones() {
         </Card>
       </section>
 
+
+      <Card className="mt-5">
+        <Etiqueta>Registrar medición</Etiqueta>
+        <form onSubmit={(e) => guardar(e)} className="mt-4 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto_auto] sm:items-end">
+          <input
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            placeholder="Descripción (ej. Caminata ligera)"
+            className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+          />
+          <input
+            type="number"
+            min={30}
+            max={230}
+            value={nuevoBpm}
+            onChange={(e) => setNuevoBpm(Number(e.target.value))}
+            aria-label="BPM"
+            className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+          />
+          <select
+            value={nuevoCtx}
+            onChange={(e) => setNuevoCtx(e.target.value as typeof nuevoCtx)}
+            aria-label="Contexto"
+            className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+          >
+            <option>Reposo</option>
+            <option>Ejercicio</option>
+            <option>Estrés</option>
+          </select>
+          <button type="submit" className="rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90">
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={(e) => guardar(e, true)}
+            className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 hover:bg-panel"
+          >
+            Guardar lectura del sensor ({dispositivo.bpm})
+          </button>
+        </form>
+        {aviso && <p className="mt-2 text-[13px] text-ink/65">{aviso}</p>}
+      </Card>
 
       <div className="mt-5 flex flex-wrap gap-2">
         {FILTROS.map((f) => (

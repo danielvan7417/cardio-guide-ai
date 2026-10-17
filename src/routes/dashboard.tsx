@@ -4,9 +4,9 @@ import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { imcDe, useSesion } from "@/lib/sesion";
+import { useMediciones } from "@/lib/datos";
 import {
   consultarAsistente,
-  mediciones,
   tendencia,
   UMBRAL_BPM,
   type RespuestaAsistente,
@@ -40,6 +40,7 @@ function Dashboard() {
   const [cargando, setCargando] = useState(false);
   const [errorApi, setErrorApi] = useState("");
   const [verSimulador, setVerSimulador] = useState(false);
+  const { lista: mediciones } = useMediciones(sesion?.id);
 
   if (!sesion) return null;
   const imc = imcDe(sesion);
@@ -65,7 +66,7 @@ function Dashboard() {
     <AppShell
       sesion={sesion}
       titulo={`Buenos días, ${sesion.nombre.split(" ")[0]}`}
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Panel de monitoreo" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/dashboard" }, { label: "Panel Principal" }]}
       acciones={
         <>
           <IndicadorDispositivo
@@ -275,6 +276,11 @@ function Dashboard() {
           </Link>
         </div>
         <div className="mt-4 divide-y divide-ink/5">
+          {mediciones.length === 0 && (
+            <p className="px-5 py-6 text-sm text-ink/55">
+              Aún no hay mediciones guardadas. Regístralas desde Mediciones.
+            </p>
+          )}
           {mediciones.slice(0, 4).map((m) => (
             <div
               key={m.id}

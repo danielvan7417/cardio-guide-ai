@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { guardarSesion, leerSesion, sesionInicial } from "@/lib/sesion";
+import { supabase } from "@/integrations/supabase/client";
 import { Onda } from "@/components/Onda";
 
 export const Route = createFileRoute("/")({
@@ -24,22 +24,76 @@ export const Route = createFileRoute("/")({
 
 function Login() {
   const navigate = useNavigate();
-  const [correo, setCorreo] = useState("andres@ritmovital.co");
+  const [modo, setModo] = useState<"entrar" | "registro" | "recuperar">("entrar");
+  const [nombre, setNombre] = useState("");
+  const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
+  const [consiente, setConsiente] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
-    if (leerSesion()) navigate({ to: "/dashboard", replace: true });
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) navigate({ to: "/dashboard", replace: true });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((ev, s) => {
+      if (ev === "SIGNED_IN" && s) navigate({ to: "/dashboard", replace: true });
+    });
+    return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
-  const entrar = (e: React.FormEvent) => {
+  const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!correo.includes("@")) return setError("Ingresa un correo electrónico válido.");
-    if (clave.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
     setError("");
-    const previa = leerSesion();
-    guardarSesion({ ...(previa ?? sesionInicial), correo });
-    navigate({ to: "/dashboard", replace: true });
+    setInfo("");
+    if (!correo.includes("@")) return setError("Ingresa un correo electrónico válido.");
+    if (modo !== "recuperar" && clave.length < 6)
+      return setError("La contraseña debe tener al menos 6 caracteres.");
+    if (modo === "registro" && !consiente)
+      return setError("Debes aceptar el tratamiento de datos (Ley 1581 de 2012).");
+    setEnviando(true);
+    try {
+      if (modo === "entrar") {
+        const { error } = await supabase.auth.signInWithPassword({ email: correo, password: clave });
+        if (error) throw error;
+      } else if (modo === "registro") {
+        const { data, error } = await supabase.auth.signUp({
+          email: correo,
+          password: clave,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { nombre, consentimiento: true },
+          },
+        });
+        if (error) throw error;
+        if (!data.session)
+          setInfo("Cuenta creada. Revisa tu correo y confirma tu cuenta para ingresar.");
+      } else {
+        const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setInfo("Te enviamos un enlace para restablecer tu contraseña.");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      setError(
+        msg.includes("Invalid login")
+          ? "Correo o contraseña incorrectos."
+          : msg.includes("not confirmed")
+            ? "Debes confirmar tu correo antes de ingresar."
+            : msg || "No se pudo completar la operación.",
+      );
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  const titulos = {
+    entrar: "Ingresa a tu panel clínico",
+    registro: "Crea tu cuenta",
+    recuperar: "Recupera tu contraseña",
   };
 
   return (
@@ -56,14 +110,25 @@ function Login() {
             </div>
           </div>
 
-          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Ingresa a tu panel clínico
-          </h1>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">{titulos[modo]}</h1>
           <p className="mt-1 text-sm text-ink/60">
-            Tus mediciones se procesan de forma local y cifrada.
+            Tus datos se guardan de forma segura y cifrada en la nube.
           </p>
 
-          <form onSubmit={entrar} className="mt-6 flex flex-col gap-4">
+          <form onSubmit={enviar} className="mt-6 flex flex-col gap-4">
+            {modo === "registro" && (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
+                  Nombre completo
+                </span>
+                <input
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+                  placeholder="Tu nombre"
+                />
+              </label>
+            )}
             <label className="flex flex-col gap-1.5">
               <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
                 Correo electrónico
@@ -76,34 +141,70 @@ function Login() {
                 placeholder="nombre@correo.com"
               />
             </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
-              <input
-                type="password"
-                value={clave}
-                onChange={(e) => setClave(e.target.value)}
-                className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
-                placeholder="••••••••"
-              />
-            </label>
+            {modo !== "recuperar" && (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
+                <input
+                  type="password"
+                  value={clave}
+                  onChange={(e) => setClave(e.target.value)}
+                  className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+                  placeholder="••••••••"
+                />
+              </label>
+            )}
+            {modo === "registro" && (
+              <label className="flex items-start gap-3 text-[13px] text-ink/70">
+                <input
+                  type="checkbox"
+                  checked={consiente}
+                  onChange={(e) => setConsiente(e.target.checked)}
+                  className="mt-0.5 size-4 accent-[var(--brand)]"
+                />
+                Autorizo el tratamiento de mis datos de salud conforme a la Ley 1581 de 2012.
+              </label>
+            )}
 
             {error && (
               <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[13px] text-destructive ring-1 ring-destructive/20">
                 {error}
               </p>
             )}
+            {info && (
+              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[13px] text-ok ring-1 ring-ok/25">
+                {info}
+              </p>
+            )}
 
             <button
               type="submit"
-              className="rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
+              disabled={enviando}
+              className="rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90 disabled:opacity-60"
             >
-              Iniciar sesión
+              {enviando
+                ? "Procesando…"
+                : modo === "entrar"
+                  ? "Iniciar sesión"
+                  : modo === "registro"
+                    ? "Crear cuenta"
+                    : "Enviar enlace"}
             </button>
 
-            <div className="flex items-center justify-between text-[13px]">
-              <a href="#recuperar" className="text-brand hover:underline">
-                ¿Olvidaste tu contraseña?
-              </a>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
+              {modo === "entrar" ? (
+                <>
+                  <button type="button" onClick={() => setModo("recuperar")} className="text-brand hover:underline">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                  <button type="button" onClick={() => setModo("registro")} className="text-brand hover:underline">
+                    Crear cuenta
+                  </button>
+                </>
+              ) : (
+                <button type="button" onClick={() => setModo("entrar")} className="text-brand hover:underline">
+                  ← Ya tengo cuenta
+                </button>
+              )}
               <span className="text-ink/45">Cifrado AES-256</span>
             </div>
           </form>

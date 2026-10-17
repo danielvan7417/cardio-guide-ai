@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
-import { estadoDe, type RegistroSintoma } from "@/lib/ritmo";
+import { estadoDe } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
+import { useSintomas } from "@/lib/datos";
 
 export const Route = createFileRoute("/sintomas")({
   head: () => ({
@@ -32,24 +33,8 @@ function Sintomas() {
   const [contexto, setContexto] = useState<(typeof CONTEXTOS)[number]>("Reposo");
   const [seleccion, setSeleccion] = useState<string[]>(["Ninguno"]);
   const [nota, setNota] = useState("");
-  const [bitacora, setBitacora] = useState<RegistroSintoma[]>([
-    {
-      id: "s1",
-      fecha: "Hoy · 07:30",
-      bpm: 135,
-      contexto: "Ejercicio",
-      sintomas: ["Mareo", "Fatiga"],
-      nota: "Sensación de falta de aire al finalizar el trote.",
-    },
-    {
-      id: "s2",
-      fecha: "Ayer · 21:10",
-      bpm: 76,
-      contexto: "Reposo",
-      sintomas: ["Ninguno"],
-      nota: "Noche tranquila, sin molestias.",
-    },
-  ]);
+  const { lista: bitacora, agregar } = useSintomas(sesion?.id);
+  const [errorGuardar, setErrorGuardar] = useState("");
 
   if (!sesion) return null;
 
@@ -61,19 +46,20 @@ function Sintomas() {
     });
   };
 
-  const guardar = (e: React.FormEvent) => {
+  const guardar = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBitacora((prev) => [
-      {
-        id: crypto.randomUUID(),
-        fecha: new Date().toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" }),
+    setErrorGuardar("");
+    try {
+      await agregar({
         bpm,
         contexto,
         sintomas: seleccion.length ? seleccion : ["Ninguno"],
-        nota: nota.trim() || "Sin notas adicionales.",
-      },
-      ...prev,
-    ]);
+        nota: nota.trim(),
+      });
+    } catch {
+      setErrorGuardar("No se pudo guardar el registro. Intenta de nuevo.");
+      return;
+    }
     setNota("");
     setSeleccion(["Ninguno"]);
   };
@@ -82,7 +68,7 @@ function Sintomas() {
     <AppShell
       sesion={sesion}
       titulo="Mapeo y diario de síntomas"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Síntomas" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud", to: "/sintomas" }, { label: "Registro de Síntomas" }]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -168,11 +154,15 @@ function Sintomas() {
             >
               Guardar en bitácora
             </button>
+            {errorGuardar && <p className="text-[13px] text-destructive">{errorGuardar}</p>}
           </form>
         </Card>
 
         <Card className="flex flex-col gap-3">
           <Etiqueta>Bitácora reciente</Etiqueta>
+          {bitacora.length === 0 && (
+            <p className="text-sm text-ink/55">Aún no tienes registros guardados.</p>
+          )}
           {bitacora.map((r) => (
             <div key={r.id} className="rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5">
               <div className="flex items-center justify-between">

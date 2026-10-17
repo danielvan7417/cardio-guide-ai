@@ -44,8 +44,8 @@ export function AppShell({
     });
   };
 
-  const salir = () => {
-    cerrarSesion();
+  const salir = async () => {
+    await cerrarSesion();
     navigate({ to: "/", replace: true });
   };
 
@@ -75,7 +75,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-surface text-ink">
-      <div className="mx-auto flex max-w-[1500px]">
+      <div className="flex w-full min-h-screen">
         <aside
           className={`glass-soft sticky top-0 hidden h-screen shrink-0 flex-col gap-5 overflow-hidden border-r border-panel/60 p-4 transition-[width] duration-300 ease-out lg:flex ${
             colapsada ? "w-[76px]" : "w-64"
@@ -121,7 +121,7 @@ export function AppShell({
           )}
         </aside>
 
-        <main className="min-w-0 flex-1 p-4 sm:p-8">
+        <main className="min-w-0 flex-1 p-4 sm:p-6 xl:p-8 2xl:p-10 2xl:text-[1.05rem]">
           <div className="mb-4 flex items-center justify-between lg:hidden">
             <Marca />
             <button
@@ -147,7 +147,7 @@ export function AppShell({
 
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="flex flex-wrap items-center gap-2 text-[13px] text-ink/55">
+              <nav aria-label="Ruta de navegación" className="flex flex-wrap items-center gap-2 text-[13px] text-ink/55">
                 {migas.map((m, i) => (
                   <span key={m.label} className="flex items-center gap-2">
                     {m.to ? (
@@ -155,12 +155,12 @@ export function AppShell({
                         {m.label}
                       </Link>
                     ) : (
-                      <span>{m.label}</span>
+                      <span className={i === migas.length - 1 ? "font-medium text-ink/80" : ""} aria-current={i === migas.length - 1 ? "page" : undefined}>{m.label}</span>
                     )}
-                    {i < migas.length - 1 && <span>/</span>}
+                    {i < migas.length - 1 && <span className="text-ink/35">/</span>}
                   </span>
                 ))}
-              </div>
+              </nav>
               <h1 className="mt-1 max-w-[40ch] text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
                 {titulo}
               </h1>
@@ -168,7 +168,7 @@ export function AppShell({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.history.back()}
-                className="inline-flex items-center gap-2 rounded-xl bg-panel/60 py-2 pl-2 pr-3 text-sm text-ink/80 ring-1 ring-ink/5 hover:bg-panel/80"
+                className="inline-flex items-center gap-2 rounded-xl bg-volver py-2 pl-3 pr-4 text-sm font-medium text-volver-foreground shadow-sm ring-1 ring-volver-hover/40 transition-colors hover:bg-volver-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-volver-hover"
               >
                 <span className="text-[13px]">←</span> Volver
               </button>
@@ -210,7 +210,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <div className={`glass rounded-[20px] p-5 ring-1 ring-ink/5 sm:p-6 ${className}`}>
+    <div className={`glass rounded-[20px] p-5 ring-1 ring-ink/5 sm:p-6 2xl:p-8 ${className}`}>
       {children}
     </div>
   );

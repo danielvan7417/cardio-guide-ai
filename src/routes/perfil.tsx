@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
+import { supabase } from "@/integrations/supabase/client";
 import { guardarSesion, imcDe, useSesion, type Sesion } from "@/lib/sesion";
 
 export const Route = createFileRoute("/perfil")({
@@ -36,13 +37,23 @@ function Perfil() {
   const set = <K extends keyof Sesion>(k: K, v: Sesion[K]) =>
     setForm((f) => (f ? { ...f, [k]: v } : f));
 
-  const enviar = (e: React.FormEvent) => {
+  const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.consentimiento) {
       setAviso("Debes autorizar el tratamiento de datos para guardar los cambios.");
       return;
     }
-    guardarSesion(form);
+    try {
+      await guardarSesion(form);
+      if (clave) {
+        if (clave.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
+        const { error } = await supabase.auth.updateUser({ password: clave });
+        if (error) throw error;
+      }
+    } catch (err) {
+      setAviso(err instanceof Error ? err.message : "No se pudieron guardar los cambios.");
+      return;
+    }
     setClave("");
     setAviso("Cambios guardados correctamente.");
   };
@@ -51,7 +62,7 @@ function Perfil() {
     <AppShell
       sesion={sesion}
       titulo="Gestión de perfil"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Perfil" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Configuración", to: "/perfil" }, { label: "Perfil de Usuario" }]}
     >
       <form onSubmit={enviar} className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
