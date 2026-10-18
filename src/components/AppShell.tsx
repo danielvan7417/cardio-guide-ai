@@ -4,13 +4,30 @@ import { useEffect, useState } from "react";
 import { cerrarSesion, type Sesion } from "@/lib/sesion";
 
 type NavItem = { to: string; label: string; icon: string };
+type Grupo = { titulo: string; to: string; items: NavItem[] };
 
-const NAV: NavItem[] = [
-  { to: "/dashboard", label: "Inicio", icon: "◉" },
-  { to: "/mediciones", label: "Mediciones", icon: "▤" },
-  { to: "/sintomas", label: "Síntomas", icon: "✚" },
-  { to: "/reportes", label: "Reportes", icon: "▦" },
-  { to: "/perfil", label: "Perfil", icon: "◐" },
+export const GRUPOS: Grupo[] = [
+  {
+    titulo: "Monitoreo",
+    to: "/monitoreo",
+    items: [
+      { to: "/dashboard", label: "Panel Principal", icon: "◉" },
+      { to: "/mediciones", label: "Mediciones", icon: "▤" },
+    ],
+  },
+  {
+    titulo: "Salud",
+    to: "/salud",
+    items: [
+      { to: "/sintomas", label: "Síntomas", icon: "✚" },
+      { to: "/reportes", label: "Reportes", icon: "▦" },
+    ],
+  },
+  {
+    titulo: "Configuración",
+    to: "/configuracion",
+    items: [{ to: "/perfil", label: "Perfil", icon: "◐" }],
+  },
 ];
 
 const CLAVE_SIDEBAR = "ritmovital:sidebar";
@@ -60,28 +77,51 @@ export function AppShell({
   };
 
   const enlaces = (mini = false) => (
-    <nav className="flex flex-col gap-1">
-      {NAV.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          title={item.label}
-          onClick={() => setMenuAbierto(false)}
-          className={`flex items-center gap-3 rounded-xl py-2.5 text-sm text-ink/70 transition-colors hover:bg-panel/50 ${
-            mini ? "justify-center px-0" : "px-3"
-          }`}
-          activeProps={{
-            className: `flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium bg-panel/70 text-brand ring-1 ring-brand/15 ${
-              mini ? "justify-center px-0" : "px-3"
-            }`,
-          }}
-        >
-          <span className="text-[13px]">{item.icon}</span>
-          {!mini && item.label}
-        </Link>
+    <nav className="flex flex-col gap-4">
+      {GRUPOS.map((g) => (
+        <div key={g.titulo} className="flex flex-col gap-1">
+          {mini ? (
+            <span className="mx-auto my-1 h-px w-6 bg-ink/10" />
+          ) : (
+            <Link
+              to={g.to}
+              onClick={() => setMenuAbierto(false)}
+              className="px-3 pb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-ink/45 hover:text-brand"
+              activeProps={{ className: "px-3 pb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-brand" }}
+            >
+              {g.titulo}
+            </Link>
+          )}
+          {g.items.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              title={item.label}
+              onClick={() => setMenuAbierto(false)}
+              className={`flex items-center gap-3 rounded-xl py-2.5 text-sm text-ink/70 transition-colors hover:bg-panel/50 ${
+                mini ? "justify-center px-0" : "px-3"
+              }`}
+              activeProps={{
+                className: `flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium bg-panel/70 text-brand ring-1 ring-brand/15 ${
+                  mini ? "justify-center px-0" : "px-3"
+                }`,
+              }}
+            >
+              <span className="text-[13px]">{item.icon}</span>
+              {!mini && item.label}
+            </Link>
+          ))}
+        </div>
       ))}
     </nav>
   );
+
+  // "Volver" sube un nivel en la miga de pan (el último enlace anterior a la página actual).
+  const padre = [...migas.slice(0, -1)].reverse().find((m) => m.to);
+  const volver = () => {
+    if (padre?.to) navigate({ to: padre.to });
+    else router.history.back();
+  };
 
   return (
     <div className="min-h-screen bg-surface text-ink">
@@ -182,7 +222,7 @@ export function AppShell({
                 onClick={volver}
                 className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               >
-                <span className="text-[13px]">←</span> Volver
+                <span className="text-[13px]">←</span> {padre ? `Volver a ${padre.label}` : "Volver"}
               </button>
               {acciones}
             </div>
