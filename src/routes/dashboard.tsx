@@ -39,7 +39,6 @@ function Dashboard() {
   const [respuesta, setRespuesta] = useState<RespuestaAsistente | null>(null);
   const [cargando, setCargando] = useState(false);
   const [errorApi, setErrorApi] = useState("");
-  const [verSimulador, setVerSimulador] = useState(false);
   const { lista: mediciones } = useMediciones(sesion?.id);
 
   if (!sesion) return null;
@@ -141,7 +140,6 @@ function Dashboard() {
                   onClick={() => {
                     const activar = !dispositivo.simulacion;
                     dispositivo.activarSimulacion(activar);
-                    setVerSimulador(activar);
                   }}
                   className={`rounded-lg px-3 py-1.5 text-[12px] font-medium ring-1 ${
                     dispositivo.simulacion
