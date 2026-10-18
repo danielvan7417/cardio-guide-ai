@@ -27,8 +27,8 @@ export const Route = createFileRoute("/reportes")({
 
 function Reportes() {
   const { sesion } = useSesion();
-  const [desde, setDesde] = useState("2026-09-01");
-  const [hasta, setHasta] = useState("2026-09-12");
+  const [desde, setDesde] = useState("2026-10-01");
+  const [hasta, setHasta] = useState("2026-10-31");
   const [aviso, setAviso] = useState("");
   const [edad, setEdad] = useState(34);
   const [reposo, setReposo] = useState(68);
@@ -40,7 +40,7 @@ function Reportes() {
   const zonas = zonasEntrenamiento(edad, reposo);
   const fcMax = 220 - edad;
 
-  const exportar = (formato: "PDF" | "Excel") => {
+  const exportar = async (formato: "PDF" | "Excel") => {
     if (desde > hasta) {
       setAviso("La fecha inicial debe ser anterior a la fecha final.");
       return;
@@ -66,10 +66,15 @@ function Reportes() {
           detalle: `${registro.sintomas.join(", ")}${registro.nota ? ` — ${registro.nota}` : ""}`,
         })),
     ];
-    if (formato === "PDF") exportarPdf(filas, desde, hasta);
-    else exportarExcel(filas, desde, hasta);
-    setExportando(false);
-    setAviso(`${formato} descargado con ${filas.length} registros.`);
+    try {
+      if (formato === "PDF") exportarPdf(filas, desde, hasta);
+      else await exportarExcel(filas, desde, hasta);
+      setAviso(`${formato} descargado con ${filas.length} registros.`);
+    } catch {
+      setAviso(`No se pudo generar el archivo ${formato}.`);
+    } finally {
+      setExportando(false);
+    }
   };
 
   return (

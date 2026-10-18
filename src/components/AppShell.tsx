@@ -66,16 +66,6 @@ export function AppShell({
     navigate({ to: "/", replace: true });
   };
 
-  const volver = () => {
-    const rutaActual = router.state.location.pathname;
-    const destino = [...migas].reverse().find((miga) => miga.to && miga.to !== rutaActual)?.to;
-    if (destino) {
-      navigate({ to: destino });
-      return;
-    }
-    router.history.back();
-  };
-
   const enlaces = (mini = false) => (
     <nav className="flex flex-col gap-4">
       {GRUPOS.map((g) => (
