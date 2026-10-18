@@ -138,3 +138,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.sintomas TO authenticated;
 GRANT ALL ON public.profiles TO service_role;
 GRANT ALL ON public.mediciones TO service_role;
 GRANT ALL ON public.sintomas TO service_role;
+
+-- Frecuencia cardíaca en reposo del usuario (usada por la calculadora de zonas)
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS fc_reposo integer NOT NULL DEFAULT 0;
