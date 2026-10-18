@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { estadoDe } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
 import { useSintomas } from "@/lib/datos";
+import { useDispositivo } from "@/lib/dispositivo";
 
 export const Route = createFileRoute("/sintomas")({
   head: () => ({
@@ -29,12 +30,19 @@ const SINTOMAS = ["Mareo", "Fatiga", "Dolor de cabeza", "Palpitaciones", "Ningun
 
 function Sintomas() {
   const { sesion } = useSesion();
+  const dispositivo = useDispositivo();
+  const [fuentePulso, setFuentePulso] = useState<"simulacion" | "manual" | "esp32">("manual");
   const [bpm, setBpm] = useState(88);
   const [contexto, setContexto] = useState<(typeof CONTEXTOS)[number]>("Reposo");
   const [seleccion, setSeleccion] = useState<string[]>(["Ninguno"]);
   const [nota, setNota] = useState("");
-  const { lista: bitacora, agregar } = useSintomas(sesion?.id);
+  const { lista: bitacora, agregar, eliminar, eliminarTodas } = useSintomas(sesion?.id);
   const [errorGuardar, setErrorGuardar] = useState("");
+
+  useEffect(() => {
+    if (fuentePulso === "simulacion") setBpm(dispositivo.bpm);
+    if (fuentePulso === "esp32") setBpm(dispositivo.bpm);
+  }, [dispositivo.bpm, fuentePulso]);
 
   if (!sesion) return null;
 
@@ -74,22 +82,59 @@ function Sintomas() {
         <Card className="lg:col-span-2">
           <Etiqueta>Nuevo registro</Etiqueta>
           <form onSubmit={guardar} className="mt-4 flex flex-col gap-5">
+            <div>
+              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Fuente del pulso</span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {[
+                  ["simulacion", "Modo simulación"],
+                  ["manual", "Manual"],
+                  ["esp32", "ESP32 real"],
+                ].map(([valor, etiqueta]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    onClick={() => {
+                      const fuente = valor as typeof fuentePulso;
+                      setFuentePulso(fuente);
+                      if (fuente === "simulacion") dispositivo.activarSimulacion(true);
+                      if (fuente === "simulacion" || fuente === "esp32") setBpm(dispositivo.bpm);
+                    }}
+                    className={`rounded-xl px-3 py-2 text-sm ring-1 ${
+                      fuentePulso === valor
+                        ? "bg-brand text-brand-foreground ring-brand/40"
+                        : "bg-panel/60 text-ink/70 ring-ink/5 hover:bg-panel/80"
+                    }`}
+                  >
+                    {etiqueta}
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="flex flex-col gap-2">
               <span className="text-sm text-ink/70">
-                Pulso actual:{" "}
-                <strong className="font-display">{bpm} BPM</strong> ·{" "}
+                Pulso actual: <strong className="font-display">{bpm} BPM</strong> · {" "}
                 <span className={estadoDe(bpm) === "Normal" ? "text-ok" : "text-warn"}>
                   {estadoDe(bpm)}
                 </span>
               </span>
-              <input
-                type="range"
-                min={45}
-                max={185}
-                value={bpm}
-                onChange={(e) => setBpm(Number(e.target.value))}
-                className="w-full accent-[var(--brand)]"
-              />
+              {fuentePulso === "manual" ? (
+                <input
+                  type="range"
+                  min={45}
+                  max={185}
+                  value={bpm}
+                  onChange={(e) => setBpm(Number(e.target.value))}
+                  className="w-full accent-[var(--brand)]"
+                />
+              ) : (
+                <p className="rounded-xl bg-panel/55 px-4 py-2.5 text-[13px] text-ink/60 ring-1 ring-ink/5">
+                  {fuentePulso === "simulacion"
+                    ? `Lectura simulada activa · ${dispositivo.bpmSimulado} BPM base`
+                    : dispositivo.enVivo
+                      ? "Lectura recibida del ESP32 en tiempo real"
+                      : "Esperando una lectura real del ESP32"}
+                </p>
+              )}
             </label>
 
             <div>
@@ -159,15 +204,49 @@ function Sintomas() {
         </Card>
 
         <Card className="flex flex-col gap-3">
-          <Etiqueta>Bitácora reciente</Etiqueta>
+          <div className="flex items-center justify-between gap-3">
+            <Etiqueta>Bitácora reciente</Etiqueta>
+            {bitacora.length > 0 && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!window.confirm("¿Borrar toda la bitácora de síntomas?")) return;
+                  try {
+                    await eliminarTodas();
+                  } catch {
+                    setErrorGuardar("No se pudo borrar la bitácora.");
+                  }
+                }}
+                className="rounded-lg bg-destructive/10 px-2.5 py-1.5 text-[11px] font-medium text-destructive ring-1 ring-destructive/20 hover:bg-destructive/15"
+              >
+                Borrar todo
+              </button>
+            )}
+          </div>
           {bitacora.length === 0 && (
             <p className="text-sm text-ink/55">Aún no tienes registros guardados.</p>
           )}
           {bitacora.map((r) => (
             <div key={r.id} className="rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <p className="font-display text-sm font-medium">{r.bpm} BPM</p>
-                <span className="text-[12px] text-ink/50">{r.fecha}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] text-ink/50">{r.fecha}</span>
+                  <button
+                    type="button"
+                    aria-label={`Borrar registro del ${r.fecha}`}
+                    onClick={async () => {
+                      try {
+                        await eliminar(r.id);
+                      } catch {
+                        setErrorGuardar("No se pudo borrar el registro.");
+                      }
+                    }}
+                    className="grid size-6 place-items-center rounded-md text-[11px] text-destructive ring-1 ring-destructive/20 hover:bg-destructive/10"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
               <p className="mt-1 text-[12px] text-ink/55">{r.contexto}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">

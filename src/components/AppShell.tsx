@@ -49,6 +49,16 @@ export function AppShell({
     navigate({ to: "/", replace: true });
   };
 
+  const volver = () => {
+    const rutaActual = router.state.location.pathname;
+    const destino = [...migas].reverse().find((miga) => miga.to && miga.to !== rutaActual)?.to;
+    if (destino) {
+      navigate({ to: destino });
+      return;
+    }
+    router.history.back();
+  };
+
   const enlaces = (mini = false) => (
     <nav className="flex flex-col gap-1">
       {NAV.map((item) => (
@@ -149,13 +159,15 @@ export function AppShell({
             <div>
               <nav aria-label="Ruta de navegación" className="flex flex-wrap items-center gap-2 text-[13px] text-ink/55">
                 {migas.map((m, i) => (
-                  <span key={m.label} className="flex items-center gap-2">
+                  <span key={`${m.label}-${i}`} className="flex items-center gap-2">
                     {m.to ? (
-                      <Link to={m.to} className="text-brand hover:underline">
+                      <Link to={m.to} className="text-brand transition-colors hover:text-sky-600 hover:underline">
                         {m.label}
                       </Link>
                     ) : (
-                      <span className={i === migas.length - 1 ? "font-medium text-ink/80" : ""} aria-current={i === migas.length - 1 ? "page" : undefined}>{m.label}</span>
+                      <span className="font-medium text-ink/80" aria-current="page">
+                        {m.label}
+                      </span>
                     )}
                     {i < migas.length - 1 && <span className="text-ink/35">/</span>}
                   </span>
@@ -167,7 +179,7 @@ export function AppShell({
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.history.back()}
+                onClick={volver}
                 className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               >
                 <span className="text-[13px]">←</span> Volver

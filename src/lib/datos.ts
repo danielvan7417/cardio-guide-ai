@@ -26,6 +26,7 @@ export function useMediciones(userId?: string) {
         bpm: m.bpm,
         contexto: m.contexto as Contexto,
         estado: estadoDe(m.bpm),
+        createdAt: m.created_at,
       })),
     );
     setCargando(false);
@@ -63,6 +64,7 @@ export function useSintomas(userId?: string) {
         contexto: s.contexto as Contexto,
         sintomas: s.sintomas,
         nota: s.nota || "Sin notas adicionales.",
+        createdAt: s.created_at,
       })),
     );
   }, [userId]);
@@ -78,5 +80,19 @@ export function useSintomas(userId?: string) {
     await cargar();
   };
 
-  return { lista, agregar };
+  const eliminar = async (id: string) => {
+    if (!userId) return;
+    const { error } = await supabase.from("sintomas").delete().eq("id", id).eq("user_id", userId);
+    if (error) throw error;
+    setLista((actual) => actual.filter((registro) => registro.id !== id));
+  };
+
+  const eliminarTodas = async () => {
+    if (!userId) return;
+    const { error } = await supabase.from("sintomas").delete().eq("user_id", userId);
+    if (error) throw error;
+    setLista([]);
+  };
+
+  return { lista, agregar, eliminar, eliminarTodas };
 }

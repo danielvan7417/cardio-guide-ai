@@ -3,6 +3,8 @@ import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { zonasEntrenamiento } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
+import { useMediciones, useSintomas } from "@/lib/datos";
+import { exportarExcel, exportarPdf, type FilaReporte } from "@/lib/exportar";
 
 export const Route = createFileRoute("/reportes")({
   head: () => ({
@@ -30,13 +32,45 @@ function Reportes() {
   const [aviso, setAviso] = useState("");
   const [edad, setEdad] = useState(34);
   const [reposo, setReposo] = useState(68);
+  const [exportando, setExportando] = useState(false);
+  const { lista: mediciones } = useMediciones(sesion?.id);
+  const { lista: sintomas } = useSintomas(sesion?.id);
 
   if (!sesion) return null;
   const zonas = zonasEntrenamiento(edad, reposo);
   const fcMax = 220 - edad;
 
-  const exportar = (formato: "PDF" | "Excel") =>
-    setAviso(`Informe ${formato} generado para el rango ${desde} → ${hasta}.`);
+  const exportar = (formato: "PDF" | "Excel") => {
+    if (desde > hasta) {
+      setAviso("La fecha inicial debe ser anterior a la fecha final.");
+      return;
+    }
+    setExportando(true);
+    const filas: FilaReporte[] = [
+      ...mediciones
+        .filter((medicion) => !medicion.createdAt || medicion.createdAt.slice(0, 10) >= desde && medicion.createdAt.slice(0, 10) <= hasta)
+        .map((medicion) => ({
+          fecha: medicion.fecha,
+          tipo: "Medición",
+          bpm: medicion.bpm,
+          contexto: medicion.contexto,
+          detalle: medicion.titulo,
+        })),
+      ...sintomas
+        .filter((registro) => !registro.createdAt || registro.createdAt.slice(0, 10) >= desde && registro.createdAt.slice(0, 10) <= hasta)
+        .map((registro) => ({
+          fecha: registro.fecha,
+          tipo: "Síntoma",
+          bpm: registro.bpm,
+          contexto: registro.contexto,
+          detalle: `${registro.sintomas.join(", ")}${registro.nota ? ` — ${registro.nota}` : ""}`,
+        })),
+    ];
+    if (formato === "PDF") exportarPdf(filas, desde, hasta);
+    else exportarExcel(filas, desde, hasta);
+    setExportando(false);
+    setAviso(`${formato} descargado con ${filas.length} registros.`);
+  };
 
   return (
     <AppShell
@@ -70,12 +104,14 @@ function Reportes() {
             <div className="mt-1 flex gap-2">
               <button
                 onClick={() => exportar("PDF")}
+                disabled={exportando}
                 className="flex-1 rounded-xl bg-brand px-3 py-2.5 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Exportar PDF
               </button>
               <button
                 onClick={() => exportar("Excel")}
+                disabled={exportando}
                 className="flex-1 rounded-xl bg-panel/60 px-3 py-2.5 text-sm font-medium text-ink/80 ring-1 ring-ink/10 hover:bg-panel/80"
               >
                 Exportar Excel

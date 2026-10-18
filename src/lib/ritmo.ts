@@ -7,6 +7,7 @@ export type Medicion = {
   bpm: number;
   contexto: "Reposo" | "Ejercicio" | "Estrés";
   estado: Estado;
+  createdAt?: string;
 };
 
 export type RegistroSintoma = {
@@ -16,6 +17,7 @@ export type RegistroSintoma = {
   contexto: "Reposo" | "Ejercicio" | "Estrés";
   sintomas: string[];
   nota: string;
+  createdAt?: string;
 };
 
 export const UMBRAL_BPM = 120;

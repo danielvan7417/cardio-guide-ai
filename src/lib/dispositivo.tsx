@@ -18,6 +18,14 @@ export type TramaSensor = {
 };
 
 const MAX_MUESTRAS = 48;
+const CLAVE_SIMULACION = "ritmovital:simulacion";
+const CLAVE_BPM_SIMULADO = "ritmovital:bpm-simulado";
+
+function leerNumero(clave: string, valorInicial: number) {
+  if (typeof window === "undefined") return valorInicial;
+  const valor = Number(window.localStorage.getItem(clave));
+  return Number.isFinite(valor) ? valor : valorInicial;
+}
 
 export function useDispositivo() {
   const [estado, setEstado] = useState<EstadoDispositivo>("Buscando dispositivo");
@@ -25,8 +33,19 @@ export function useDispositivo() {
   const [muestras, setMuestras] = useState<number[]>([]);
   const [ultimaTrama, setUltimaTrama] = useState<string>("");
   const [simulacion, setSimulacion] = useState(false);
-  const [bpmSimulado, setBpmSimulado] = useState(72);
+  const [bpmSimulado, setBpmSimuladoState] = useState(72);
   const fallos = useRef(0);
+
+  useEffect(() => {
+    setSimulacion(window.localStorage.getItem(CLAVE_SIMULACION) === "1");
+    setBpmSimuladoState(leerNumero(CLAVE_BPM_SIMULADO, 72));
+    const sincronizar = () => {
+      setSimulacion(window.localStorage.getItem(CLAVE_SIMULACION) === "1");
+      setBpmSimuladoState(leerNumero(CLAVE_BPM_SIMULADO, 72));
+    };
+    window.addEventListener("ritmovital:simulacion", sincronizar);
+    return () => window.removeEventListener("ritmovital:simulacion", sincronizar);
+  }, []);
 
   const empujar = useCallback((valor: number) => {
     setBpm(valor);
@@ -84,11 +103,16 @@ export function useDispositivo() {
     simulacion,
     activarSimulacion: (v: boolean) => {
       fallos.current = 0;
+      window.localStorage.setItem(CLAVE_SIMULACION, v ? "1" : "0");
       setSimulacion(v);
       setEstado(v ? "Conectado" : "Buscando dispositivo");
+      window.dispatchEvent(new Event("ritmovital:simulacion"));
     },
     bpmSimulado,
-    setBpmSimulado,
+    setBpmSimulado: (valor: number) => {
+      window.localStorage.setItem(CLAVE_BPM_SIMULADO, String(valor));
+      setBpmSimuladoState(valor);
+    },
     alertaActiva: bpm >= UMBRAL_BPM,
     enVivo: estado === "Transmitiendo Live",
   };
