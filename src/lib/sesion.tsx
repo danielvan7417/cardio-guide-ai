@@ -11,6 +11,7 @@ export type Sesion = {
   peso: number;
   estatura: number;
   consentimiento: boolean;
+  fcReposo: number;
 };
 
 const EVENTO = "ritmovital:sesion";
@@ -28,6 +29,7 @@ export async function leerSesion(): Promise<Sesion | null> {
     peso: Number(data?.peso ?? 70),
     estatura: Number(data?.estatura ?? 1.7),
     consentimiento: data?.consentimiento ?? false,
+    fcReposo: data?.fc_reposo ?? 0,
   };
 }
 
@@ -41,6 +43,7 @@ export async function guardarSesion(s: Sesion) {
     peso: s.peso,
     estatura: s.estatura,
     consentimiento: s.consentimiento,
+    fc_reposo: s.fcReposo,
   });
   if (error) throw error;
   window.dispatchEvent(new Event(EVENTO));
