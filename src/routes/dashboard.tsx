@@ -153,7 +153,7 @@ function Dashboard() {
                 </button>
               </div>
             </div>
-            {verSimulador && dispositivo.simulacion && (
+            {dispositivo.simulacion && (
               <label className="mt-3 block">
                 <span className="text-[12px] text-ink/55">
                   BPM simulado · umbral seguro {UMBRAL_BPM} BPM
