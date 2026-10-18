@@ -64,7 +64,7 @@ function Mediciones() {
     <AppShell
       sesion={sesion}
       titulo="Historial de mediciones"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/dashboard" }, { label: "Historial de Mediciones" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Historial de Mediciones" }]}
       acciones={
         <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
       }
@@ -73,10 +73,37 @@ function Mediciones() {
         <Card className="lg:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Etiqueta>Traza en vivo del sensor</Etiqueta>
-            <span className="font-display text-lg font-semibold">
-              {dispositivo.bpm} <span className="text-[12px] text-ink/50">BPM</span>
-            </span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => dispositivo.activarSimulacion(!dispositivo.simulacion)}
+                aria-pressed={dispositivo.simulacion}
+                className={`rounded-xl px-3 py-1.5 text-[12px] font-medium ring-1 ${
+                  dispositivo.simulacion
+                    ? "bg-brand text-brand-foreground ring-brand/40"
+                    : "bg-panel/70 text-ink/70 ring-ink/10 hover:bg-panel"
+                }`}
+              >
+                {dispositivo.simulacion ? "Simulación activa" : "Activar simulación"}
+              </button>
+              <span className="font-display text-lg font-semibold">
+                {dispositivo.bpm} <span className="text-[12px] text-ink/50">BPM</span>
+              </span>
+            </div>
           </div>
+          {dispositivo.simulacion && (
+            <label className="mt-3 flex items-center gap-3 text-[13px] text-ink/65">
+              Pulso simulado: <strong className="font-display">{dispositivo.bpmSimulado}</strong>
+              <input
+                type="range"
+                min={45}
+                max={185}
+                value={dispositivo.bpmSimulado}
+                onChange={(e) => dispositivo.setBpmSimulado(Number(e.target.value))}
+                className="flex-1 accent-[var(--brand)]"
+              />
+            </label>
+          )}
           <div className="mt-4">
             <Onda
               alto="h-24"

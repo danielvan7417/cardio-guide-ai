@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { UMBRAL_BPM } from "@/lib/ritmo";
 
 export type EstadoDispositivo =
@@ -17,104 +17,134 @@ export type TramaSensor = {
   timestamp?: string;
 };
 
+type EstadoStore = {
+  estado: EstadoDispositivo;
+  bpm: number;
+  muestras: number[];
+  ultimaTrama: string;
+  simulacion: boolean;
+  bpmSimulado: number;
+  /** Último pulso real recibido del ESP32 (null si nunca llegó o se perdió la señal). */
+  bpmEsp32: number | null;
+};
+
 const MAX_MUESTRAS = 48;
 const CLAVE_SIMULACION = "ritmovital:simulacion";
 const CLAVE_BPM_SIMULADO = "ritmovital:bpm-simulado";
+const INTERVALO = 1200;
 
-function leerNumero(clave: string, valorInicial: number) {
-  if (typeof window === "undefined") return valorInicial;
-  const valor = Number(window.localStorage.getItem(clave));
-  return Number.isFinite(valor) ? valor : valorInicial;
+const INICIAL: EstadoStore = {
+  estado: "Buscando dispositivo",
+  bpm: 72,
+  muestras: [],
+  ultimaTrama: "",
+  simulacion: false,
+  bpmSimulado: 72,
+  bpmEsp32: null,
+};
+
+/* Store global: vive mientras la app está abierta, así el modo simulación
+   y la traza no se reinician al cambiar de página. */
+let state: EstadoStore = INICIAL;
+const oyentes = new Set<() => void>();
+let iniciado = false;
+let fallos = 0;
+let leyendo = false;
+
+function set(parcial: Partial<EstadoStore>) {
+  state = { ...state, ...parcial };
+  oyentes.forEach((o) => o());
+}
+
+function empujar(valor: number, extra: Partial<EstadoStore> = {}) {
+  set({
+    bpm: valor,
+    muestras: [...state.muestras, valor].slice(-MAX_MUESTRAS),
+    ultimaTrama: new Date().toLocaleTimeString("es-CO"),
+    ...extra,
+  });
+}
+
+async function leerSensor() {
+  if (leyendo) return;
+  leyendo = true;
+  try {
+    const res = await fetch(SENSOR_URL, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(String(res.status));
+    const trama = (await res.json()) as TramaSensor;
+    if (typeof trama.bpm !== "number") throw new Error("trama inválida");
+    fallos = 0;
+    const v = Math.round(trama.bpm);
+    if (state.simulacion) set({ bpmEsp32: v });
+    else empujar(v, { estado: "Transmitiendo Live", bpmEsp32: v });
+  } catch {
+    fallos += 1;
+    const perdido = fallos >= 3;
+    set({
+      bpmEsp32: perdido ? null : state.bpmEsp32,
+      ...(state.simulacion ? {} : { estado: perdido ? "Desconectado" : "Buscando dispositivo" }),
+    });
+  } finally {
+    leyendo = false;
+  }
+}
+
+function tick() {
+  if (state.simulacion) {
+    const ruido = Math.round((Math.random() - 0.5) * 6);
+    empujar(Math.max(40, state.bpmSimulado + ruido), { estado: "Conectado" });
+  }
+  void leerSensor();
+}
+
+function iniciar() {
+  if (iniciado || typeof window === "undefined") return;
+  iniciado = true;
+  const sim = window.localStorage.getItem(CLAVE_SIMULACION) === "1";
+  const n = Number(window.localStorage.getItem(CLAVE_BPM_SIMULADO));
+  set({
+    simulacion: sim,
+    bpmSimulado: Number.isFinite(n) && n > 0 ? n : 72,
+    estado: sim ? "Conectado" : "Buscando dispositivo",
+  });
+  tick();
+  window.setInterval(tick, INTERVALO);
+}
+
+function suscribir(o: () => void) {
+  iniciar();
+  oyentes.add(o);
+  return () => oyentes.delete(o);
+}
+
+export function activarSimulacion(v: boolean) {
+  window.localStorage.setItem(CLAVE_SIMULACION, v ? "1" : "0");
+  fallos = 0;
+  set({
+    simulacion: v,
+    estado: v ? "Conectado" : "Buscando dispositivo",
+    muestras: [],
+  });
+  if (v) empujar(state.bpmSimulado);
+}
+
+export function setBpmSimulado(valor: number) {
+  window.localStorage.setItem(CLAVE_BPM_SIMULADO, String(valor));
+  set({ bpmSimulado: valor });
 }
 
 export function useDispositivo() {
-  const [estado, setEstado] = useState<EstadoDispositivo>("Buscando dispositivo");
-  const [bpm, setBpm] = useState(72);
-  const [muestras, setMuestras] = useState<number[]>([]);
-  const [ultimaTrama, setUltimaTrama] = useState<string>("");
-  const [simulacion, setSimulacion] = useState(false);
-  const [bpmSimulado, setBpmSimuladoState] = useState(72);
-  const fallos = useRef(0);
-
-  useEffect(() => {
-    setSimulacion(window.localStorage.getItem(CLAVE_SIMULACION) === "1");
-    setBpmSimuladoState(leerNumero(CLAVE_BPM_SIMULADO, 72));
-    const sincronizar = () => {
-      setSimulacion(window.localStorage.getItem(CLAVE_SIMULACION) === "1");
-      setBpmSimuladoState(leerNumero(CLAVE_BPM_SIMULADO, 72));
-    };
-    window.addEventListener("ritmovital:simulacion", sincronizar);
-    return () => window.removeEventListener("ritmovital:simulacion", sincronizar);
-  }, []);
-
-  const empujar = useCallback((valor: number) => {
-    setBpm(valor);
-    setMuestras((prev) => [...prev, valor].slice(-MAX_MUESTRAS));
-  }, []);
-
-  // Modo hardware: lectura periódica de tramas del ESP32.
-  useEffect(() => {
-    if (simulacion) return;
-    let vivo = true;
-
-    const leer = async () => {
-      try {
-        const res = await fetch(SENSOR_URL, { headers: { Accept: "application/json" } });
-        if (!res.ok) throw new Error(String(res.status));
-        const trama = (await res.json()) as TramaSensor;
-        if (!vivo || typeof trama.bpm !== "number") return;
-        fallos.current = 0;
-        empujar(Math.round(trama.bpm));
-        setUltimaTrama(new Date().toLocaleTimeString("es-CO"));
-        setEstado("Transmitiendo Live");
-      } catch {
-        if (!vivo) return;
-        fallos.current += 1;
-        setEstado(fallos.current >= 3 ? "Desconectado" : "Buscando dispositivo");
-      }
-    };
-
-    void leer();
-    const id = setInterval(leer, 1500);
-    return () => {
-      vivo = false;
-      clearInterval(id);
-    };
-  }, [simulacion, empujar]);
-
-  // Modo simulación avanzada (pruebas sin hardware).
-  useEffect(() => {
-    if (!simulacion) return;
-    setEstado("Conectado");
-    const id = setInterval(() => {
-      const ruido = Math.round((Math.random() - 0.5) * 4);
-      empujar(Math.max(40, bpmSimulado + ruido));
-      setUltimaTrama(new Date().toLocaleTimeString("es-CO"));
-    }, 1200);
-    empujar(bpmSimulado);
-    return () => clearInterval(id);
-  }, [simulacion, bpmSimulado, empujar]);
-
+  const s = useSyncExternalStore(
+    suscribir,
+    () => state,
+    () => INICIAL,
+  );
   return {
-    estado,
-    bpm,
-    muestras,
-    ultimaTrama,
-    simulacion,
-    activarSimulacion: (v: boolean) => {
-      fallos.current = 0;
-      window.localStorage.setItem(CLAVE_SIMULACION, v ? "1" : "0");
-      setSimulacion(v);
-      setEstado(v ? "Conectado" : "Buscando dispositivo");
-      window.dispatchEvent(new Event("ritmovital:simulacion"));
-    },
-    bpmSimulado,
-    setBpmSimulado: (valor: number) => {
-      window.localStorage.setItem(CLAVE_BPM_SIMULADO, String(valor));
-      setBpmSimuladoState(valor);
-    },
-    alertaActiva: bpm >= UMBRAL_BPM,
-    enVivo: estado === "Transmitiendo Live",
+    ...s,
+    activarSimulacion,
+    setBpmSimulado,
+    alertaActiva: s.bpm >= UMBRAL_BPM,
+    enVivo: s.estado === "Transmitiendo Live",
   };
 }
 
@@ -150,10 +180,12 @@ export function IndicadorDispositivo({
       title={ultimaTrama ? `Última trama ${ultimaTrama}` : "Sin tramas recibidas"}
     >
       <span className={`size-1.5 rounded-full ${punto}`} />
-      {compacto ? estado.replace("Transmitiendo ", "") : `ESP32 · ${estado}`}
-      {!compacto && ultimaTrama && (
-        <span className="text-ink/45">· {ultimaTrama}</span>
-      )}
+      {compacto
+        ? estado.replace("Transmitiendo ", "")
+        : estado === "Conectado"
+          ? "Simulación activa"
+          : `ESP32 · ${estado}`}
+      {!compacto && ultimaTrama && <span className="text-ink/45">· {ultimaTrama}</span>}
     </span>
   );
 }

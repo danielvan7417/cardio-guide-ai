@@ -51,6 +51,7 @@ export type Database = {
           created_at: string
           edad: number
           estatura: number
+          fc_reposo: number
           id: string
           nombre: string
           peso: number
@@ -63,6 +64,7 @@ export type Database = {
           created_at?: string
           edad?: number
           estatura?: number
+          fc_reposo?: number
           id: string
           nombre?: string
           peso?: number
@@ -75,6 +77,7 @@ export type Database = {
           created_at?: string
           edad?: number
           estatura?: number
+          fc_reposo?: number
           id?: string
           nombre?: string
           peso?: number

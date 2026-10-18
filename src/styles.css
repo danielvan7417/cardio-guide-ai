@@ -126,12 +126,26 @@
   animation: rvPulse 1.6s ease-in-out infinite;
 }
 
+@keyframes rvScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility rv-scroll {
+  animation: rvScroll 4s linear infinite;
+}
+
 @utility rv-sweep {
   animation: rvSweep 3.2s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rv-pulse,
+  .rv-scroll,
   .rv-sweep {
     animation: none;
   }

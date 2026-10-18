@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { estadoDe } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
@@ -32,17 +32,23 @@ function Sintomas() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [fuentePulso, setFuentePulso] = useState<"simulacion" | "manual" | "esp32">("manual");
-  const [bpm, setBpm] = useState(88);
+  const [bpmManual, setBpm] = useState(88);
   const [contexto, setContexto] = useState<(typeof CONTEXTOS)[number]>("Reposo");
   const [seleccion, setSeleccion] = useState<string[]>(["Ninguno"]);
   const [nota, setNota] = useState("");
   const { lista: bitacora, agregar, eliminar, eliminarTodas } = useSintomas(sesion?.id);
   const [errorGuardar, setErrorGuardar] = useState("");
 
-  useEffect(() => {
-    if (fuentePulso === "simulacion") setBpm(dispositivo.bpm);
-    if (fuentePulso === "esp32") setBpm(dispositivo.bpm);
-  }, [dispositivo.bpm, fuentePulso]);
+  // El pulso del registro depende de la fuente elegida.
+  const bpmFuente =
+    fuentePulso === "manual"
+      ? bpmManual
+      : fuentePulso === "simulacion"
+        ? dispositivo.simulacion
+          ? dispositivo.bpm
+          : null
+        : dispositivo.bpmEsp32;
+  const bpm = bpmFuente ?? 0;
 
   if (!sesion) return null;
 
@@ -57,6 +63,14 @@ function Sintomas() {
   const guardar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorGuardar("");
+    if (bpmFuente === null) {
+      setErrorGuardar(
+        fuentePulso === "esp32"
+          ? "No hay lectura del ESP32. Verifica que el sensor y el servidor local estén encendidos."
+          : "Activa el modo simulación para tomar el pulso simulado.",
+      );
+      return;
+    }
     try {
       await agregar({
         bpm,
@@ -76,7 +90,7 @@ function Sintomas() {
     <AppShell
       sesion={sesion}
       titulo="Mapeo y diario de síntomas"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud", to: "/sintomas" }, { label: "Registro de Síntomas" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud", to: "/salud" }, { label: "Registro de Síntomas" }]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -97,7 +111,6 @@ function Sintomas() {
                       const fuente = valor as typeof fuentePulso;
                       setFuentePulso(fuente);
                       if (fuente === "simulacion") dispositivo.activarSimulacion(true);
-                      if (fuente === "simulacion" || fuente === "esp32") setBpm(dispositivo.bpm);
                     }}
                     className={`rounded-xl px-3 py-2 text-sm ring-1 ${
                       fuentePulso === valor
@@ -112,25 +125,34 @@ function Sintomas() {
             </div>
             <label className="flex flex-col gap-2">
               <span className="text-sm text-ink/70">
-                Pulso actual: <strong className="font-display">{bpm} BPM</strong> · {" "}
-                <span className={estadoDe(bpm) === "Normal" ? "text-ok" : "text-warn"}>
-                  {estadoDe(bpm)}
-                </span>
+                Pulso actual:{" "}
+                {bpmFuente === null ? (
+                  <strong className="text-warn">sin lectura</strong>
+                ) : (
+                  <>
+                    <strong className="font-display">{bpm} BPM</strong> ·{" "}
+                    <span className={estadoDe(bpm) === "Normal" ? "text-ok" : "text-warn"}>
+                      {estadoDe(bpm)}
+                    </span>
+                  </>
+                )}
               </span>
               {fuentePulso === "manual" ? (
                 <input
                   type="range"
                   min={45}
                   max={185}
-                  value={bpm}
+                  value={bpmManual}
                   onChange={(e) => setBpm(Number(e.target.value))}
                   className="w-full accent-[var(--brand)]"
                 />
               ) : (
                 <p className="rounded-xl bg-panel/55 px-4 py-2.5 text-[13px] text-ink/60 ring-1 ring-ink/5">
                   {fuentePulso === "simulacion"
-                    ? `Lectura simulada activa · ${dispositivo.bpmSimulado} BPM base`
-                    : dispositivo.enVivo
+                    ? dispositivo.simulacion
+                      ? `Lectura simulada en vivo · ${dispositivo.bpmSimulado} BPM base`
+                      : "El modo simulación está apagado"
+                    : dispositivo.bpmEsp32 !== null
                       ? "Lectura recibida del ESP32 en tiempo real"
                       : "Esperando una lectura real del ESP32"}
                 </p>

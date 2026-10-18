@@ -24,7 +24,7 @@ function escaparHtml(valor: string) {
       '"': "&quot;",
       "'": "&#39;",
     };
-    return entidades[caracter];
+    return entidades[caracter] ?? caracter;
   });
 }
 

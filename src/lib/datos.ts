@@ -73,7 +73,7 @@ export function useSintomas(userId?: string) {
     cargar();
   }, [cargar]);
 
-  const agregar = async (r: Omit<RegistroSintoma, "id" | "fecha">) => {
+  const agregar = async (r: Omit<RegistroSintoma, "id" | "fecha" | "createdAt">) => {
     if (!userId) return;
     const { error } = await supabase.from("sintomas").insert({ ...r, user_id: userId });
     if (error) throw error;

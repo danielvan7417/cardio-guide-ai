@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS fc_reposo integer NOT NULL DEFAULT 0;

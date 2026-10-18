@@ -10,16 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MedicionesRouteImport } from './routes/mediciones'
+import { Route as MonitoreoRouteImport } from './routes/monitoreo'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ReportesRouteImport } from './routes/reportes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SaludRouteImport } from './routes/salud'
 import { Route as SintomasRouteImport } from './routes/sintomas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracionRoute = ConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -30,6 +38,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const MedicionesRoute = MedicionesRouteImport.update({
   id: '/mediciones',
   path: '/mediciones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonitoreoRoute = MonitoreoRouteImport.update({
+  id: '/monitoreo',
+  path: '/monitoreo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerfilRoute = PerfilRouteImport.update({
@@ -47,6 +60,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SaludRoute = SaludRouteImport.update({
+  id: '/salud',
+  path: '/salud',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SintomasRoute = SintomasRouteImport.update({
   id: '/sintomas',
   path: '/sintomas',
@@ -55,69 +73,90 @@ const SintomasRoute = SintomasRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/mediciones': typeof MedicionesRoute
+  '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/mediciones': typeof MedicionesRoute
+  '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/mediciones': typeof MedicionesRoute
+  '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/configuracion'
     | '/dashboard'
     | '/mediciones'
+    | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/configuracion'
     | '/dashboard'
     | '/mediciones'
+    | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   id:
     | '__root__'
     | '/'
+    | '/configuracion'
     | '/dashboard'
     | '/mediciones'
+    | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConfiguracionRoute: typeof ConfiguracionRoute
   DashboardRoute: typeof DashboardRoute
   MedicionesRoute: typeof MedicionesRoute
+  MonitoreoRoute: typeof MonitoreoRoute
   PerfilRoute: typeof PerfilRoute
   ReportesRoute: typeof ReportesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SaludRoute: typeof SaludRoute
   SintomasRoute: typeof SintomasRoute
 }
 
@@ -128,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracion': {
+      id: '/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof ConfiguracionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -142,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/mediciones'
       fullPath: '/mediciones'
       preLoaderRoute: typeof MedicionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monitoreo': {
+      id: '/monitoreo'
+      path: '/monitoreo'
+      fullPath: '/monitoreo'
+      preLoaderRoute: typeof MonitoreoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perfil': {
@@ -165,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/salud': {
+      id: '/salud'
+      path: '/salud'
+      fullPath: '/salud'
+      preLoaderRoute: typeof SaludRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sintomas': {
       id: '/sintomas'
       path: '/sintomas'
@@ -177,11 +237,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConfiguracionRoute: ConfiguracionRoute,
   DashboardRoute: DashboardRoute,
   MedicionesRoute: MedicionesRoute,
+  MonitoreoRoute: MonitoreoRoute,
   PerfilRoute: PerfilRoute,
   ReportesRoute: ReportesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SaludRoute: SaludRoute,
   SintomasRoute: SintomasRoute,
 }
 export const routeTree = rootRouteImport

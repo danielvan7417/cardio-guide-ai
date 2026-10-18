@@ -39,7 +39,6 @@ function Dashboard() {
   const [respuesta, setRespuesta] = useState<RespuestaAsistente | null>(null);
   const [cargando, setCargando] = useState(false);
   const [errorApi, setErrorApi] = useState("");
-  const [verSimulador, setVerSimulador] = useState(false);
   const { lista: mediciones } = useMediciones(sesion?.id);
 
   if (!sesion) return null;
@@ -66,7 +65,7 @@ function Dashboard() {
     <AppShell
       sesion={sesion}
       titulo={`Buenos días, ${sesion.nombre.split(" ")[0]}`}
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/dashboard" }, { label: "Panel Principal" }]}
+      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Panel Principal" }]}
       acciones={
         <>
           <IndicadorDispositivo
@@ -141,7 +140,6 @@ function Dashboard() {
                   onClick={() => {
                     const activar = !dispositivo.simulacion;
                     dispositivo.activarSimulacion(activar);
-                    setVerSimulador(activar);
                   }}
                   className={`rounded-lg px-3 py-1.5 text-[12px] font-medium ring-1 ${
                     dispositivo.simulacion
@@ -153,7 +151,7 @@ function Dashboard() {
                 </button>
               </div>
             </div>
-            {verSimulador && dispositivo.simulacion && (
+            {dispositivo.simulacion && (
               <label className="mt-3 block">
                 <span className="text-[12px] text-ink/55">
                   BPM simulado · umbral seguro {UMBRAL_BPM} BPM
