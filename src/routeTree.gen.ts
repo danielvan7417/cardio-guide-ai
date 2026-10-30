@@ -18,6 +18,7 @@ import { Route as MonitoreoRouteImport } from './routes/monitoreo'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ReportesRouteImport } from './routes/reportes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SaludRouteImport } from './routes/salud'
 import { Route as SintomasRouteImport } from './routes/sintomas'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +66,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SaludRoute = SaludRouteImport.update({
+  id: '/salud',
+  path: '/salud',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SintomasRoute = SintomasRouteImport.update({
   id: '/sintomas',
   path: '/sintomas',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/reportes'
     | '/reset-password'
+    | '/salud'
     | '/sintomas'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   PerfilRoute: typeof PerfilRoute
   ReportesRoute: typeof ReportesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SaludRoute: typeof SaludRoute
   SintomasRoute: typeof SintomasRoute
 }
 
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/salud': {
+      id: '/salud'
+      path: '/salud'
+      fullPath: '/salud'
+      preLoaderRoute: typeof SaludRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sintomas': {
       id: '/sintomas'
       path: '/sintomas'
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   PerfilRoute: PerfilRoute,
   ReportesRoute: ReportesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SaludRoute: SaludRoute,
   SintomasRoute: SintomasRoute,
 }
 export const routeTree = rootRouteImport
