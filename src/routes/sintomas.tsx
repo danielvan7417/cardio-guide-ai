@@ -97,7 +97,7 @@ function Sintomas() {
           <Etiqueta>Nuevo registro</Etiqueta>
           <form onSubmit={guardar} className="mt-4 flex flex-col gap-5">
             <div>
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Fuente del pulso</span>
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Fuente del pulso</span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {[
                   ["simulacion", "Modo simulación"],
@@ -147,7 +147,7 @@ function Sintomas() {
                   className="w-full accent-[var(--brand)]"
                 />
               ) : (
-                <p className="rounded-xl bg-panel/55 px-4 py-2.5 text-[13px] text-ink/60 ring-1 ring-ink/5">
+                <p className="rounded-xl bg-panel/55 px-4 py-2.5 text-[0.8125rem] text-ink/60 ring-1 ring-ink/5">
                   {fuentePulso === "simulacion"
                     ? dispositivo.simulacion
                       ? `Lectura simulada en vivo · ${dispositivo.bpmSimulado} BPM base`
@@ -160,7 +160,7 @@ function Sintomas() {
             </label>
 
             <div>
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
                 Contexto de actividad
               </span>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -182,7 +182,7 @@ function Sintomas() {
             </div>
 
             <div>
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Síntomas</span>
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Síntomas</span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SINTOMAS.map((s) => (
                   <button
@@ -203,7 +203,7 @@ function Sintomas() {
             </div>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
                 Notas de bitácora
               </span>
               <textarea
@@ -221,7 +221,7 @@ function Sintomas() {
             >
               Guardar en bitácora
             </button>
-            {errorGuardar && <p className="text-[13px] text-destructive">{errorGuardar}</p>}
+            {errorGuardar && <p className="text-[0.8125rem] text-destructive">{errorGuardar}</p>}
           </form>
         </Card>
 
@@ -239,7 +239,7 @@ function Sintomas() {
                     setErrorGuardar("No se pudo borrar la bitácora.");
                   }
                 }}
-                className="rounded-lg bg-destructive/10 px-2.5 py-1.5 text-[11px] font-medium text-destructive ring-1 ring-destructive/20 hover:bg-destructive/15"
+                className="rounded-lg bg-destructive/10 px-2.5 py-1.5 text-[0.6875rem] font-medium text-destructive ring-1 ring-destructive/20 hover:bg-destructive/15"
               >
                 Borrar todo
               </button>
@@ -253,7 +253,7 @@ function Sintomas() {
               <div className="flex items-center justify-between gap-2">
                 <p className="font-display text-sm font-medium">{r.bpm} BPM</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-[12px] text-ink/50">{r.fecha}</span>
+                  <span className="text-[0.75rem] text-ink/50">{r.fecha}</span>
                   <button
                     type="button"
                     aria-label={`Borrar registro del ${r.fecha}`}
@@ -264,24 +264,24 @@ function Sintomas() {
                         setErrorGuardar("No se pudo borrar el registro.");
                       }
                     }}
-                    className="grid size-6 place-items-center rounded-md text-[11px] text-destructive ring-1 ring-destructive/20 hover:bg-destructive/10"
+                    className="grid size-6 place-items-center rounded-md text-[0.6875rem] text-destructive ring-1 ring-destructive/20 hover:bg-destructive/10"
                   >
                     ×
                   </button>
                 </div>
               </div>
-              <p className="mt-1 text-[12px] text-ink/55">{r.contexto}</p>
+              <p className="mt-1 text-[0.75rem] text-ink/55">{r.contexto}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {r.sintomas.map((s) => (
                   <span
                     key={s}
-                    className="rounded-lg bg-panel/70 px-2 py-0.5 text-[11px] text-ink/60 ring-1 ring-ink/5"
+                    className="rounded-lg bg-panel/70 px-2 py-0.5 text-[0.6875rem] text-ink/60 ring-1 ring-ink/5"
                   >
                     {s}
                   </span>
                 ))}
               </div>
-              <p className="mt-2 text-[13px] leading-relaxed text-ink/65">{r.nota}</p>
+              <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink/65">{r.nota}</p>
             </div>
           ))}
         </Card>

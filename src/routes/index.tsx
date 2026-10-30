@@ -105,8 +105,8 @@ function Login() {
               <span className="rv-pulse size-2.5 rounded-full bg-brand" />
             </div>
             <div>
-              <p className="font-display text-[15px] font-semibold">RitmoVital</p>
-              <p className="text-[11px] text-ink/50">Monitoreo cardíaco</p>
+              <p className="font-display text-[0.9375rem] font-semibold">RitmoVital</p>
+              <p className="text-[0.6875rem] text-ink/50">Monitoreo cardíaco</p>
             </div>
           </div>
 
@@ -118,7 +118,7 @@ function Login() {
           <form onSubmit={enviar} className="mt-6 flex flex-col gap-4">
             {modo === "registro" && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
+                <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
                   Nombre completo
                 </span>
                 <input
@@ -130,7 +130,7 @@ function Login() {
               </label>
             )}
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
                 Correo electrónico
               </span>
               <input
@@ -143,7 +143,7 @@ function Login() {
             </label>
             {modo !== "recuperar" && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
+                <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
                 <input
                   type="password"
                   value={clave}
@@ -154,7 +154,7 @@ function Login() {
               </label>
             )}
             {modo === "registro" && (
-              <label className="flex items-start gap-3 text-[13px] text-ink/70">
+              <label className="flex items-start gap-3 text-[0.8125rem] text-ink/70">
                 <input
                   type="checkbox"
                   checked={consiente}
@@ -166,12 +166,12 @@ function Login() {
             )}
 
             {error && (
-              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[13px] text-destructive ring-1 ring-destructive/20">
+              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20">
                 {error}
               </p>
             )}
             {info && (
-              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[13px] text-ok ring-1 ring-ok/25">
+              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[0.8125rem] text-ok ring-1 ring-ok/25">
                 {info}
               </p>
             )}
@@ -190,7 +190,7 @@ function Login() {
                     : "Enviar enlace"}
             </button>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[0.8125rem]">
               {modo === "entrar" ? (
                 <>
                   <button type="button" onClick={() => setModo("recuperar")} className="text-brand hover:underline">
@@ -209,7 +209,7 @@ function Login() {
             </div>
           </form>
 
-          <p className="mt-6 rounded-xl bg-panel/60 px-4 py-3 text-[12px] leading-relaxed text-ink/55 ring-1 ring-ink/5">
+          <p className="mt-6 rounded-xl bg-panel/60 px-4 py-3 text-[0.75rem] leading-relaxed text-ink/55 ring-1 ring-ink/5">
             Protección de datos sensibles de salud conforme a la Ley 1581 de 2012 de Colombia. Tus
             datos biométricos nunca se comparten sin tu consentimiento.
           </p>
@@ -227,7 +227,7 @@ function Etiquetas() {
   return (
     <>
       <div>
-        <p className="text-[12px] uppercase tracking-[0.14em] text-ink/50">Monitoreo continuo</p>
+        <p className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Monitoreo continuo</p>
         <h2 className="mt-2 max-w-[18ch] text-3xl font-semibold leading-tight tracking-tight">
           Tu ritmo cardíaco, vigilado en tiempo real
         </h2>

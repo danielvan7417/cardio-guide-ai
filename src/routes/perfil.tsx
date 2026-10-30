@@ -141,7 +141,7 @@ function Perfil() {
 
         <Card className="flex flex-col gap-3">
           <Etiqueta>Consentimiento informado</Etiqueta>
-          <p className="text-[13px] leading-relaxed text-ink/65">
+          <p className="text-[0.8125rem] leading-relaxed text-ink/65">
             Autorizo de manera previa, expresa e informada a RitmoVital para recolectar, almacenar y
             tratar mis datos personales sensibles de salud, conforme a la Ley 1581 de 2012 y el
             Decreto 1377 de 2013 de Colombia. Puedo revocar esta autorización en cualquier momento.
@@ -153,14 +153,14 @@ function Perfil() {
               onChange={(e) => set("consentimiento", e.target.checked)}
               className="mt-0.5 size-4 accent-[var(--brand)]"
             />
-            <span className="text-[13px] text-ink/75">
+            <span className="text-[0.8125rem] text-ink/75">
               Acepto el tratamiento de mis datos personales sensibles (obligatorio).
             </span>
           </label>
 
           {aviso && (
             <p
-              className={`rounded-xl px-3 py-2 text-[13px] ring-1 ${
+              className={`rounded-xl px-3 py-2 text-[0.8125rem] ring-1 ${
                 aviso.startsWith("Cambios")
                   ? "bg-ok/10 text-ok ring-ok/25"
                   : "bg-destructive/10 text-destructive ring-destructive/20"
@@ -188,7 +188,7 @@ const inputCls =
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[12px] uppercase tracking-[0.14em] text-ink/50">{label}</span>
+      <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">{label}</span>
       {children}
     </label>
   );

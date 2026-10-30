@@ -28,7 +28,7 @@ export function Hub({ titulo, seccion, opciones }: { titulo: string; seccion: st
               <p className="font-display text-lg font-semibold">{o.titulo}</p>
               <p className="mt-1 text-sm text-ink/60">{o.descripcion}</p>
             </div>
-            <span className="mt-auto text-[13px] font-medium text-brand group-hover:underline">
+            <span className="mt-auto text-[0.8125rem] font-medium text-brand group-hover:underline">
               Abrir →
             </span>
           </Link>

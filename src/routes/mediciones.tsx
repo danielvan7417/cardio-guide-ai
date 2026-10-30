@@ -78,7 +78,7 @@ function Mediciones() {
                 type="button"
                 onClick={() => dispositivo.activarSimulacion(!dispositivo.simulacion)}
                 aria-pressed={dispositivo.simulacion}
-                className={`rounded-xl px-3 py-1.5 text-[12px] font-medium ring-1 ${
+                className={`rounded-xl px-3 py-1.5 text-[0.75rem] font-medium ring-1 ${
                   dispositivo.simulacion
                     ? "bg-brand text-brand-foreground ring-brand/40"
                     : "bg-panel/70 text-ink/70 ring-ink/10 hover:bg-panel"
@@ -87,12 +87,12 @@ function Mediciones() {
                 {dispositivo.simulacion ? "Simulación activa" : "Activar simulación"}
               </button>
               <span className="font-display text-lg font-semibold">
-                {dispositivo.bpm} <span className="text-[12px] text-ink/50">BPM</span>
+                {dispositivo.bpm} <span className="text-[0.75rem] text-ink/50">BPM</span>
               </span>
             </div>
           </div>
           {dispositivo.simulacion && (
-            <label className="mt-3 flex items-center gap-3 text-[13px] text-ink/65">
+            <label className="mt-3 flex items-center gap-3 text-[0.8125rem] text-ink/65">
               Pulso simulado: <strong className="font-display">{dispositivo.bpmSimulado}</strong>
               <input
                 type="range"
@@ -162,7 +162,7 @@ function Mediciones() {
             Guardar lectura del sensor ({dispositivo.bpm})
           </button>
         </form>
-        {aviso && <p className="mt-2 text-[13px] text-ink/65">{aviso}</p>}
+        {aviso && <p className="mt-2 text-[0.8125rem] text-ink/65">{aviso}</p>}
       </Card>
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -194,15 +194,15 @@ function Mediciones() {
                     m.estado === "Normal" ? "bg-ok/10 text-ok" : "bg-warn/10 text-warn"
                   }`}
                 >
-                  <span className="text-[13px]">❯</span>
+                  <span className="text-[0.8125rem]">❯</span>
                 </div>
                 <div>
                   <p className="text-sm font-medium">{m.titulo}</p>
-                  <p className="text-[12px] text-ink/50">{m.fecha}</p>
+                  <p className="text-[0.75rem] text-ink/50">{m.fecha}</p>
                 </div>
               </div>
               <div className="hidden text-sm text-ink/65 sm:block">{m.bpm} BPM</div>
-              <div className="hidden text-[13px] text-ink/50 sm:block">{m.contexto}</div>
+              <div className="hidden text-[0.8125rem] text-ink/50 sm:block">{m.contexto}</div>
               <span className="justify-self-start sm:justify-self-end">
                 <EstadoPill estado={m.estado} />
               </span>
