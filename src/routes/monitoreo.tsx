@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
+import { ControlBluetooth } from "@/components/ControlBluetooth";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { useMediciones } from "@/lib/datos";
 import { useSesion } from "@/lib/sesion";
@@ -35,7 +36,7 @@ function Monitoreo() {
       sesion={sesion}
       titulo="Centro de monitoreo"
       migas={[{ label: "Inicio", to: "/inicio" }, { label: "Monitoreo" }]}
-      acciones={<IndicadorDispositivo estado={d.estado} ultimaTrama={d.ultimaTrama} />}
+      acciones={<><IndicadorDispositivo estado={d.estado} ultimaTrama={d.ultimaTrama} /><ControlBluetooth /></>}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -55,13 +56,14 @@ function Monitoreo() {
             </span>
           </div>
           <div className="mt-4">
-            <Onda muestras={d.muestras} alerta={d.alertaActiva} />
+            <Onda muestras={d.muestras} activa={d.enVivo || d.simulacion} alerta={d.alertaActiva} />
           </div>
         </Card>
 
         <Card className="flex flex-col gap-3">
           <Etiqueta>Sensor ESP32</Etiqueta>
           <Dato k="Estado" v={d.estado} />
+          <Dato k="Conexión" v={d.fuente === "ble" ? "Bluetooth" : d.fuente === "wifi" ? "Servidor local" : "—"} />
           <Dato k="Última trama" v={d.ultimaTrama || "—"} />
           <Dato k="Pulso real" v={d.bpmEsp32 != null ? `${d.bpmEsp32} BPM` : "Sin lectura"} />
           <Dato k="Oxigenación" v={d.spo2Esp32 != null ? `${d.spo2Esp32}%` : "Sin lectura"} />

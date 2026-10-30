@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
+import { ControlBluetooth } from "@/components/ControlBluetooth";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { imcDe, useSesion } from "@/lib/sesion";
 import { useMediciones } from "@/lib/datos";
@@ -84,6 +85,7 @@ function Dashboard() {
             estado={dispositivo.estado}
             ultimaTrama={dispositivo.ultimaTrama}
           />
+          <ControlBluetooth />
           <Link
             to="/sintomas"
             className="inline-flex items-center gap-2 rounded-xl bg-brand px-3 py-2 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
