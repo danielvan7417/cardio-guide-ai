@@ -24,7 +24,7 @@ function Reset() {
     if (clave.length < 6) return setMsg("La contraseña debe tener al menos 6 caracteres.");
     const { error } = await supabase.auth.updateUser({ password: clave });
     if (error) return setMsg(error.message);
-    navigate({ to: "/dashboard", replace: true });
+    navigate({ to: "/inicio", replace: true });
   };
 
   return (

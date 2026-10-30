@@ -35,10 +35,10 @@ function Login() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/dashboard", replace: true });
+      if (data.user) navigate({ to: "/inicio", replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((ev, s) => {
-      if (ev === "SIGNED_IN" && s) navigate({ to: "/dashboard", replace: true });
+      if (ev === "SIGNED_IN" && s) navigate({ to: "/inicio", replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
