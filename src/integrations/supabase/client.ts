@@ -49,7 +49,7 @@ function createSupabaseFetch(supabaseUrl: string, supabaseKey: string): typeof f
 function projectRefFromJwt(value: string): string | undefined {
   if (!value.startsWith("eyJ")) return undefined;
   try {
-    const payload = JSON.parse(atob(value.split(".")[1])) as { ref?: string };
+    const payload = JSON.parse(atob(value.split(".")[1] ?? "")) as { ref?: string };
     return payload.ref;
   } catch {
     return undefined;
@@ -81,7 +81,7 @@ function createSupabaseClient() {
 
   return createClient<Database>(SUPABASE_URL, supabaseKey, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY),
+      fetch: createSupabaseFetch(SUPABASE_URL, supabaseKey),
     },
     auth: {
       storage: brokeredPreviewStorage(),
