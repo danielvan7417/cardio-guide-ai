@@ -36,7 +36,9 @@ describe("Conexión y sincronización ESP32 BLE", () => {
     t.emitir(135);
     expect(t.store.useDispositivo()).toMatchObject({ bpm: 135, bpmEsp32: 135, alertaActiva: true, fuente: "ble", enVivo: true });
     expect(t.fetchMock).toHaveBeenCalledWith("http://127.0.0.1:5000/api/sensor", expect.objectContaining({ method: "POST", body: expect.any(String) }));
-    expect(JSON.parse(t.fetchMock.mock.calls[0][1].body)).toMatchObject({ bpm: 135, dispositivo: "ESP32-BLE", alerta_activa: true });
+    const request = t.fetchMock.mock.calls[0]?.[1];
+    if (!request) throw new Error("No se envió la lectura");
+    expect(JSON.parse(request.body)).toMatchObject({ bpm: 135, dispositivo: "ESP32-BLE", alerta_activa: true });
   });
   it("mantiene el pulso en vivo aunque Flask no responda", async () => {
     const t = await preparar();
@@ -53,7 +55,9 @@ describe("Conexión y sincronización ESP32 BLE", () => {
     await t.store.conectarBLE();
     t.emitir(70);
     expect(t.store.useDispositivo()).toMatchObject({ bpm: 95, bpmEsp32: 70, simulacion: true });
-    expect(JSON.parse(t.fetchMock.mock.calls[0][1].body).bpm).toBe(70);
+    const request = t.fetchMock.mock.calls[0]?.[1];
+    if (!request) throw new Error("No se envió la lectura");
+    expect(JSON.parse(request.body).bpm).toBe(70);
     t.store.activarSimulacion(false);
     expect(t.store.useDispositivo()).toMatchObject({ bpm: 70, enVivo: true });
   });
