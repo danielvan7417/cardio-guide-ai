@@ -12,7 +12,7 @@ export function Hub({ titulo, seccion, opciones }: { titulo: string; seccion: st
     <AppShell
       sesion={sesion}
       titulo={titulo}
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: seccion }]}
+      migas={[{ label: "Inicio", to: "/inicio" }, { label: seccion }]}
     >
       <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 sm:gap-5">
         {opciones.map((o) => (

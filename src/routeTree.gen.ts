@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as MedicionesRouteImport } from './routes/mediciones'
 import { Route as MonitoreoRouteImport } from './routes/monitoreo'
 import { Route as PerfilRouteImport } from './routes/perfil'
@@ -33,6 +34,11 @@ const ConfiguracionRoute = ConfiguracionRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InicioRoute = InicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MedicionesRoute = MedicionesRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracionRoute: typeof ConfiguracionRoute
   DashboardRoute: typeof DashboardRoute
+  InicioRoute: typeof InicioRoute
   MedicionesRoute: typeof MedicionesRoute
   MonitoreoRoute: typeof MonitoreoRoute
   PerfilRoute: typeof PerfilRoute
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inicio': {
+      id: '/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof InicioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mediciones': {
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracionRoute: ConfiguracionRoute,
   DashboardRoute: DashboardRoute,
+  InicioRoute: InicioRoute,
   MedicionesRoute: MedicionesRoute,
   MonitoreoRoute: MonitoreoRoute,
   PerfilRoute: PerfilRoute,
