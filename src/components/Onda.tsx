@@ -81,7 +81,7 @@ export function Onda({
         />
       )}
       {!d && !activa && (
-        <span className="absolute right-3 top-2 rounded-md bg-panel/80 px-2 py-0.5 text-[11px] text-ink/55">
+        <span className="absolute right-3 top-2 rounded-md bg-panel/80 px-2 py-0.5 text-[0.6875rem] text-ink/55">
           Esperando señal
         </span>
       )}

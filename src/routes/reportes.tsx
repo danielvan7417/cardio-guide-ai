@@ -89,7 +89,7 @@ function Reportes() {
           <p className="mt-0.5 text-sm text-ink/60">Selecciona el rango de fechas a exportar.</p>
           <div className="mt-4 flex flex-col gap-3">
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] text-ink/55">Desde</span>
+              <span className="text-[0.75rem] text-ink/55">Desde</span>
               <input
                 type="date"
                 value={desde}
@@ -98,7 +98,7 @@ function Reportes() {
               />
             </label>
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] text-ink/55">Hasta</span>
+              <span className="text-[0.75rem] text-ink/55">Hasta</span>
               <input
                 type="date"
                 value={hasta}
@@ -123,7 +123,7 @@ function Reportes() {
               </button>
             </div>
             {aviso && (
-              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[13px] text-ok ring-1 ring-ok/25">
+              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[0.8125rem] text-ok ring-1 ring-ok/25">
                 {aviso}
               </p>
             )}
@@ -140,7 +140,7 @@ function Reportes() {
             </div>
             <div className="flex gap-3">
               <label className="flex flex-col gap-1.5">
-                <span className="text-[12px] text-ink/55">Edad</span>
+                <span className="text-[0.75rem] text-ink/55">Edad</span>
                 <input
                   type="number"
                   min={12}
@@ -151,7 +151,7 @@ function Reportes() {
                 />
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-[12px] text-ink/55">FC en reposo</span>
+                <span className="text-[0.75rem] text-ink/55">FC en reposo</span>
                 <input
                   type="number"
                   min={35}
@@ -169,7 +169,7 @@ function Reportes() {
               <div key={z.nombre} className="rounded-xl bg-panel/55 p-4 ring-1 ring-ink/5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-display text-sm font-semibold">{z.nombre}</p>
-                  <span className="text-[13px] text-ink/60">
+                  <span className="text-[0.8125rem] text-ink/60">
                     {z.desde} – {z.hasta} BPM · {z.porcentaje}
                   </span>
                 </div>
@@ -179,7 +179,7 @@ function Reportes() {
                     style={{ width: `${40 + i * 20}%`, opacity: 0.4 + i * 0.2 }}
                   />
                 </div>
-                <p className="mt-2 text-[12px] text-ink/55">{z.descripcion}</p>
+                <p className="mt-2 text-[0.75rem] text-ink/55">{z.descripcion}</p>
               </div>
             ))}
           </div>

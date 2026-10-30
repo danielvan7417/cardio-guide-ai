@@ -38,7 +38,7 @@ function Reset() {
           placeholder="••••••••"
           className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
         />
-        {msg && <p className="text-[13px] text-destructive">{msg}</p>}
+        {msg && <p className="text-[0.8125rem] text-destructive">{msg}</p>}
         <button className="rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground">
           Guardar contraseña
         </button>

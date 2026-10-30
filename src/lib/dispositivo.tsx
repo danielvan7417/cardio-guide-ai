@@ -12,6 +12,7 @@ export const SENSOR_URL = "http://127.0.0.1:5000/api/sensor";
 
 export type TramaSensor = {
   bpm: number;
+  spo2?: number;
   alerta_activa?: boolean;
   dispositivo?: string;
   timestamp?: string;
@@ -26,6 +27,8 @@ type EstadoStore = {
   bpmSimulado: number;
   /** Último pulso real recibido del ESP32 (null si nunca llegó o se perdió la señal). */
   bpmEsp32: number | null;
+  /** Última oxigenación (SpO₂ %) enviada por el ESP32, si el sensor la reporta. */
+  spo2Esp32: number | null;
 };
 
 const MAX_MUESTRAS = 48;
@@ -41,6 +44,7 @@ const INICIAL: EstadoStore = {
   simulacion: false,
   bpmSimulado: 72,
   bpmEsp32: null,
+  spo2Esp32: null,
 };
 
 /* Store global: vive mientras la app está abierta, así el modo simulación
@@ -75,6 +79,7 @@ async function leerSensor() {
     if (typeof trama.bpm !== "number") throw new Error("trama inválida");
     fallos = 0;
     const v = Math.round(trama.bpm);
+    set({ spo2Esp32: typeof trama.spo2 === "number" ? Math.round(trama.spo2) : null });
     if (state.simulacion) set({ bpmEsp32: v });
     else empujar(v, { estado: "Transmitiendo Live", bpmEsp32: v });
   } catch {
@@ -82,6 +87,7 @@ async function leerSensor() {
     const perdido = fallos >= 3;
     set({
       bpmEsp32: perdido ? null : state.bpmEsp32,
+      spo2Esp32: perdido ? null : state.spo2Esp32,
       ...(state.simulacion ? {} : { estado: perdido ? "Desconectado" : "Buscando dispositivo" }),
     });
   } finally {
@@ -176,7 +182,7 @@ export function IndicadorDispositivo({
 
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-medium ring-1 ${tono}`}
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.75rem] font-medium ring-1 ${tono}`}
       title={ultimaTrama ? `Última trama ${ultimaTrama}` : "Sin tramas recibidas"}
     >
       <span className={`size-1.5 rounded-full ${punto}`} />

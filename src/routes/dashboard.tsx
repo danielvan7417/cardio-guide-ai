@@ -76,7 +76,7 @@ function Dashboard() {
             to="/sintomas"
             className="inline-flex items-center gap-2 rounded-xl bg-brand px-3 py-2 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
           >
-            <span className="text-[13px]">＋</span> Nueva medición
+            <span className="text-[0.8125rem]">＋</span> Nueva medición
           </Link>
         </>
       }
@@ -99,14 +99,14 @@ function Dashboard() {
                 </span>
                 <span className="mb-1.5 text-sm text-ink/55">BPM</span>
               </div>
-              <p className="mt-1 text-[12px] text-ink/50">
+              <p className="mt-1 text-[0.75rem] text-ink/50">
                 {dispositivo.ultimaTrama
                   ? `Última trama recibida ${dispositivo.ultimaTrama}`
                   : "Esperando tramas del microcontrolador…"}
               </p>
             </div>
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.8125rem] font-medium ring-1 ${
                 elevado ? "bg-warn/10 text-warn ring-warn/25" : "bg-ok/10 text-ok ring-ok/25"
               }`}
             >
@@ -123,7 +123,7 @@ function Dashboard() {
           </div>
 
           {elevado && (
-            <p className="mt-4 rounded-xl bg-warn/10 px-4 py-3 text-[13px] text-ink ring-1 ring-warn/25">
+            <p className="mt-4 rounded-xl bg-warn/10 px-4 py-3 text-[0.8125rem] text-ink ring-1 ring-warn/25">
               <span className="font-semibold text-warn">Regla de seguridad activada:</span> el
               sensor reporta {bpm} BPM, por encima del umbral de {UMBRAL_BPM} BPM. Detén la
               actividad y consulta al asistente.
@@ -132,7 +132,7 @@ function Dashboard() {
 
           <div className="mt-4 rounded-xl bg-panel/50 p-3 ring-1 ring-ink/5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[12px] text-ink/60">
+              <p className="text-[0.75rem] text-ink/60">
                 Modo de simulación avanzada (solo pruebas sin hardware)
               </p>
               <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ function Dashboard() {
                     const activar = !dispositivo.simulacion;
                     dispositivo.activarSimulacion(activar);
                   }}
-                  className={`rounded-lg px-3 py-1.5 text-[12px] font-medium ring-1 ${
+                  className={`rounded-lg px-3 py-1.5 text-[0.75rem] font-medium ring-1 ${
                     dispositivo.simulacion
                       ? "bg-brand text-brand-foreground ring-brand/40"
                       : "bg-panel/70 text-ink/70 ring-ink/5 hover:bg-panel"
@@ -153,7 +153,7 @@ function Dashboard() {
             </div>
             {dispositivo.simulacion && (
               <label className="mt-3 block">
-                <span className="text-[12px] text-ink/55">
+                <span className="text-[0.75rem] text-ink/55">
                   BPM simulado · umbral seguro {UMBRAL_BPM} BPM
                 </span>
                 <input
@@ -177,7 +177,7 @@ function Dashboard() {
             ].map((t) => (
               <span
                 key={t}
-                className="rounded-lg bg-panel/70 px-2.5 py-1 text-[11px] text-ink/60 ring-1 ring-ink/5"
+                className="rounded-lg bg-panel/70 px-2.5 py-1 text-[0.6875rem] text-ink/60 ring-1 ring-ink/5"
               >
                 {t}
               </span>
@@ -204,7 +204,7 @@ function Dashboard() {
               <Etiqueta>Tendencia semanal</Etiqueta>
               <p className="mt-0.5 text-sm text-ink/60">Frecuencia cardíaca promedio por día</p>
             </div>
-            <span className="text-[12px] text-ink/50">Últimos 7 días</span>
+            <span className="text-[0.75rem] text-ink/50">Últimos 7 días</span>
           </div>
           <div className="mt-5 flex h-32 items-end gap-2 sm:gap-4">
             {tendencia.map((d) => (
@@ -213,7 +213,7 @@ function Dashboard() {
                   className={`w-full rounded-t-lg ${d.alto ? "bg-warn/50" : "bg-brand/35"}`}
                   style={{ height: `${d.valor}%` }}
                 />
-                <span className="text-[11px] text-ink/45">{d.dia}</span>
+                <span className="text-[0.6875rem] text-ink/45">{d.dia}</span>
               </div>
             ))}
           </div>
@@ -239,21 +239,21 @@ function Dashboard() {
           </button>
 
           {errorApi && (
-            <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-[13px] text-destructive ring-1 ring-destructive/20">
+            <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20">
               {errorApi}
             </p>
           )}
 
           {respuesta && (
             <div
-              className={`mt-3 rounded-xl px-4 py-3 text-[13px] leading-relaxed ring-1 ${
+              className={`mt-3 rounded-xl px-4 py-3 text-[0.8125rem] leading-relaxed ring-1 ${
                 respuesta.alerta_activa
                   ? "bg-warn/10 text-ink ring-warn/25"
                   : "bg-ok/10 text-ink ring-ok/25"
               }`}
             >
               {respuesta.alerta_activa && (
-                <p className="mb-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-warn">
+                <p className="mb-1 text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-warn">
                   Alerta médica activa · {respuesta.bpm_registrado} BPM
                 </p>
               )}
@@ -269,7 +269,7 @@ function Dashboard() {
             <Etiqueta>Registro de mediciones</Etiqueta>
             <p className="mt-0.5 text-sm text-ink/60">Últimas lecturas detectadas</p>
           </div>
-          <Link to="/mediciones" className="text-[13px] font-medium text-brand hover:underline">
+          <Link to="/mediciones" className="text-[0.8125rem] font-medium text-brand hover:underline">
             Ver todo
           </Link>
         </div>
@@ -290,15 +290,15 @@ function Dashboard() {
                     m.estado === "Normal" ? "bg-ok/10 text-ok" : "bg-warn/10 text-warn"
                   }`}
                 >
-                  <span className="text-[13px]">❯</span>
+                  <span className="text-[0.8125rem]">❯</span>
                 </div>
                 <div>
                   <p className="text-sm font-medium">{m.titulo}</p>
-                  <p className="text-[12px] text-ink/50">{m.fecha}</p>
+                  <p className="text-[0.75rem] text-ink/50">{m.fecha}</p>
                 </div>
               </div>
               <div className="hidden text-sm text-ink/65 sm:block">{m.bpm} BPM</div>
-              <div className="hidden text-[13px] text-ink/50 sm:block">{m.contexto}</div>
+              <div className="hidden text-[0.8125rem] text-ink/50 sm:block">{m.contexto}</div>
               <span className="justify-self-start sm:justify-self-end">
                 <EstadoPill estado={m.estado} />
               </span>
@@ -324,13 +324,13 @@ function Lectura({
   return (
     <div className="flex items-center justify-between rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5">
       <div>
-        <p className="text-[12px] text-ink/55">{titulo}</p>
+        <p className="text-[0.75rem] text-ink/55">{titulo}</p>
         <p className="font-display text-xl font-semibold">{valor}</p>
       </div>
       {punto ? (
         <span className="size-2 rounded-full bg-ok" />
       ) : (
-        <span className="text-[12px] text-ink/45">{sufijo}</span>
+        <span className="text-[0.75rem] text-ink/45">{sufijo}</span>
       )}
     </div>
   );
