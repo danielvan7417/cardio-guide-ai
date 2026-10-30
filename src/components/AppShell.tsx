@@ -208,6 +208,7 @@ export function AppShell({
               </h1>
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              {acciones}
 
               <button
                 onClick={volver}
