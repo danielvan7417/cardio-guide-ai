@@ -29,20 +29,24 @@ export const Route = createFileRoute("/reportes")({
 
 function Reportes() {
   const { sesion } = useSesion();
-  const [desde, setDesde] = useState("2026-10-01");
-  const [hasta, setHasta] = useState("2026-10-31");
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
   const [aviso, setAviso] = useState("");
-  const [edad, setEdad] = useState(34);
-  const [reposo, setReposo] = useState(68);
+  const [edad, setEdad] = useState("");
+  const [reposo, setReposo] = useState("");
   const [exportando, setExportando] = useState(false);
   const { lista: mediciones } = useMediciones(sesion?.id);
   const { lista: sintomas } = useSintomas(sesion?.id);
 
   if (!sesion) return null;
-  const zonas = zonasEntrenamiento(edad, reposo);
-  const fcMax = 220 - edad;
+  const zonas = edad && reposo ? zonasEntrenamiento(Number(edad), Number(reposo)) : [];
+  const fcMax = edad ? 220 - Number(edad) : null;
 
   const exportar = async (formato: "PDF" | "Excel") => {
+    if (!desde || !hasta) {
+      setAviso("Selecciona las fechas inicial y final del informe.");
+      return;
+    }
     if (desde > hasta) {
       setAviso("La fecha inicial debe ser anterior a la fecha final.");
       return;
@@ -111,14 +115,14 @@ function Reportes() {
             <div className="mt-1 flex gap-2">
               <button
                 onClick={() => exportar("PDF")}
-                disabled={exportando}
+                disabled={exportando || !desde || !hasta}
                 className="flex-1 rounded-xl bg-brand px-3 py-2.5 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Exportar PDF
               </button>
               <button
                 onClick={() => exportar("Excel")}
-                disabled={exportando}
+                disabled={exportando || !desde || !hasta}
                 className="flex-1 rounded-xl bg-panel/60 px-3 py-2.5 text-sm font-medium text-ink/80 ring-1 ring-ink/10 hover:bg-panel/80"
               >
                 Exportar Excel
@@ -137,7 +141,7 @@ function Reportes() {
             <div>
               <Etiqueta>Calculadora de zonas</Etiqueta>
               <p className="mt-0.5 text-sm text-ink/60">
-                Frecuencia máxima estimada: <strong className="font-display">{fcMax} BPM</strong>
+                Frecuencia máxima estimada: <strong className="font-display">{fcMax === null ? "—" : `${fcMax} BPM`}</strong>
               </p>
             </div>
             <div className="flex gap-3">
@@ -148,7 +152,8 @@ function Reportes() {
                   min={12}
                   max={95}
                   value={edad}
-                  onChange={(e) => setEdad(Number(e.target.value) || 0)}
+                  onChange={(e) => setEdad(e.target.value)}
+                  placeholder="Años"
                   className="w-24 rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
                 />
               </label>
@@ -159,7 +164,8 @@ function Reportes() {
                   min={35}
                   max={110}
                   value={reposo}
-                  onChange={(e) => setReposo(Number(e.target.value) || 0)}
+                  onChange={(e) => setReposo(e.target.value)}
+                  placeholder="BPM"
                   className="w-28 rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
                 />
               </label>

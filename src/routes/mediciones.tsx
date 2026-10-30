@@ -36,14 +36,14 @@ function Mediciones() {
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>("Todas");
   const { lista: mediciones, agregar } = useMediciones(sesion?.id);
   const [titulo, setTitulo] = useState("");
-  const [nuevoBpm, setNuevoBpm] = useState(72);
+  const [nuevoBpm, setNuevoBpm] = useState("");
   const [nuevoCtx, setNuevoCtx] = useState<"Reposo" | "Ejercicio" | "Estrés">("Reposo");
   const [aviso, setAviso] = useState("");
   if (!sesion) return null;
 
   const guardar = async (e: React.FormEvent, desdeSensor = false) => {
     e.preventDefault();
-    const bpmFinal = desdeSensor ? dispositivo.bpm : nuevoBpm;
+    const bpmFinal = desdeSensor ? dispositivo.bpm : Number(nuevoBpm);
     if (!bpmFinal || bpmFinal < 30 || bpmFinal > 230) return setAviso("Pulso fuera de rango (30–230).");
     try {
       await agregar({
@@ -53,6 +53,7 @@ function Mediciones() {
         origen: desdeSensor ? "esp32" : "manual",
       });
       setTitulo("");
+      setNuevoBpm("");
       setAviso("Medición guardada.");
     } catch {
       setAviso("No se pudo guardar la medición.");
@@ -139,7 +140,8 @@ function Mediciones() {
             min={30}
             max={230}
             value={nuevoBpm}
-            onChange={(e) => setNuevoBpm(Number(e.target.value))}
+            onChange={(e) => setNuevoBpm(e.target.value)}
+            placeholder="BPM"
             aria-label="BPM"
             className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
           />
