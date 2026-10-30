@@ -4,6 +4,12 @@ import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { useMediciones } from "@/lib/datos";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
 
 import { useSesion } from "@/lib/sesion";
 
@@ -34,7 +40,10 @@ function Mediciones() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>("Todas");
-  const { lista: mediciones, agregar } = useMediciones(sesion?.id);
+  const { lista: mediciones, agregar, eliminar } = useMediciones(sesion?.id);
+  const [pendiente, setPendiente] = useState<{ id: string; titulo: string } | null>(null);
+  const [borrando, setBorrando] = useState(false);
+  const [errorBorrado, setErrorBorrado] = useState("");
   const [titulo, setTitulo] = useState("");
   const [nuevoBpm, setNuevoBpm] = useState("");
   const [nuevoCtx, setNuevoCtx] = useState<"Reposo" | "Ejercicio" | "Estrés">("Reposo");
@@ -57,6 +66,21 @@ function Mediciones() {
       setAviso("Medición guardada.");
     } catch {
       setAviso("No se pudo guardar la medición.");
+    }
+  };
+
+  const borrar = async () => {
+    if (!pendiente || borrando) return;
+    setBorrando(true);
+    setErrorBorrado("");
+    try {
+      await eliminar(pendiente.id);
+      setPendiente(null);
+      setAviso("Medición eliminada.");
+    } catch {
+      setErrorBorrado("No se pudo eliminar la medición. Inténtalo de nuevo.");
+    } finally {
+      setBorrando(false);
     }
   };
 
@@ -207,9 +231,20 @@ function Mediciones() {
               </div>
               <div className="hidden text-sm text-ink/65 sm:block">{m.bpm} BPM</div>
               <div className="hidden text-[0.8125rem] text-ink/50 sm:block">{m.contexto}</div>
-              <span className="justify-self-start sm:justify-self-end">
+              <div className="flex items-center gap-2 justify-self-end">
                 <EstadoPill estado={m.estado} />
-              </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 text-ink/50 hover:bg-alert/10 hover:text-alert"
+                  aria-label={`Eliminar medición: ${m.titulo}`}
+                  title="Eliminar medición"
+                  onClick={() => { setErrorBorrado(""); setPendiente(m); }}
+                >
+                  <Trash2 />
+                </Button>
+              </div>
             </div>
           ))}
           {lista.length === 0 && (
@@ -219,6 +254,23 @@ function Mediciones() {
           )}
         </div>
       </section>
+      <AlertDialog open={pendiente !== null} onOpenChange={(abierto) => { if (!abierto && !borrando) setPendiente(null); }}>
+        <AlertDialogContent className="w-[calc(100%-2rem)]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta medición?</AlertDialogTitle>
+            <AlertDialogDescription className="break-words">
+              «{pendiente?.titulo}» se borrará de tu historial. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {errorBorrado && <p role="alert" className="text-sm text-alert">{errorBorrado}</p>}
+          <AlertDialogFooter className="gap-2">
+            <Button variant="outline" disabled={borrando} onClick={() => setPendiente(null)}>Cancelar</Button>
+            <Button variant="destructive" disabled={borrando} onClick={borrar}>
+              <Trash2 />{borrando ? "Eliminando…" : "Eliminar"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
