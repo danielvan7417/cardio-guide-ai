@@ -81,7 +81,7 @@ function Reportes() {
     <AppShell
       sesion={sesion}
       titulo="Reportes y zonas de entrenamiento"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud", to: "/salud" }, { label: "Reportes y Zonas" }]}
+      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Salud", to: "/salud" }, { label: "Reportes y Zonas" }]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-1">

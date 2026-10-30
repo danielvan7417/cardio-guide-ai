@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { useSesion } from "@/lib/sesion";
 
-export const Route = createFileRoute("/salud")({
+export const Route = createFileRoute("/inicio")({
   head: () => ({
     meta: [
       { title: "Bienvenido a RitmoVital — Salud cardíaca" },
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/salud")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Salud,
+  component: Inicio,
 });
 
 const FUNCIONES = [
@@ -30,14 +30,14 @@ const FUNCIONES = [
   { icono: "◐", titulo: "Perfil biométrico", texto: "Edad, peso, estatura, tipo de sangre y FC en reposo.", to: "/perfil" },
 ] as const;
 
-function Salud() {
+function Inicio() {
   const { sesion } = useSesion();
   if (!sesion) return null;
   return (
     <AppShell
       sesion={sesion}
       titulo="Bienvenido a RitmoVital"
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Salud" }]}
+      migas={[{ label: "Inicio" }]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">

@@ -74,7 +74,7 @@ function Dashboard() {
     <AppShell
       sesion={sesion}
       titulo={`Buenos días, ${sesion.nombre.split(" ")[0]}`}
-      migas={[{ label: "Inicio", to: "/dashboard" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Panel Principal" }]}
+      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Panel Principal" }]}
       acciones={
         <>
           <IndicadorDispositivo
