@@ -12,12 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as MedicionesRouteImport } from './routes/mediciones'
 import { Route as MonitoreoRouteImport } from './routes/monitoreo'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ReportesRouteImport } from './routes/reportes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as SaludRouteImport } from './routes/salud'
 import { Route as SintomasRouteImport } from './routes/sintomas'
 
 const IndexRoute = IndexRouteImport.update({
@@ -33,6 +33,11 @@ const ConfiguracionRoute = ConfiguracionRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InicioRoute = InicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MedicionesRoute = MedicionesRouteImport.update({
@@ -60,11 +65,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SaludRoute = SaludRouteImport.update({
-  id: '/salud',
-  path: '/salud',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SintomasRoute = SintomasRouteImport.update({
   id: '/sintomas',
   path: '/sintomas',
@@ -75,24 +75,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRoutesById {
@@ -100,12 +100,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
+  '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
   '/monitoreo': typeof MonitoreoRoute
   '/perfil': typeof PerfilRoute
   '/reportes': typeof ReportesRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/salud': typeof SaludRoute
   '/sintomas': typeof SintomasRoute
 }
 export interface FileRouteTypes {
@@ -114,36 +114,36 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
-    | '/salud'
     | '/sintomas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
-    | '/salud'
     | '/sintomas'
   id:
     | '__root__'
     | '/'
     | '/configuracion'
     | '/dashboard'
+    | '/inicio'
     | '/mediciones'
     | '/monitoreo'
     | '/perfil'
     | '/reportes'
     | '/reset-password'
-    | '/salud'
     | '/sintomas'
   fileRoutesById: FileRoutesById
 }
@@ -151,12 +151,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracionRoute: typeof ConfiguracionRoute
   DashboardRoute: typeof DashboardRoute
+  InicioRoute: typeof InicioRoute
   MedicionesRoute: typeof MedicionesRoute
   MonitoreoRoute: typeof MonitoreoRoute
   PerfilRoute: typeof PerfilRoute
   ReportesRoute: typeof ReportesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SaludRoute: typeof SaludRoute
   SintomasRoute: typeof SintomasRoute
 }
 
@@ -181,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inicio': {
+      id: '/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof InicioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mediciones': {
@@ -218,13 +225,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/salud': {
-      id: '/salud'
-      path: '/salud'
-      fullPath: '/salud'
-      preLoaderRoute: typeof SaludRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sintomas': {
       id: '/sintomas'
       path: '/sintomas'
@@ -239,12 +239,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracionRoute: ConfiguracionRoute,
   DashboardRoute: DashboardRoute,
+  InicioRoute: InicioRoute,
   MedicionesRoute: MedicionesRoute,
   MonitoreoRoute: MonitoreoRoute,
   PerfilRoute: PerfilRoute,
   ReportesRoute: ReportesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SaludRoute: SaludRoute,
   SintomasRoute: SintomasRoute,
 }
 export const routeTree = rootRouteImport

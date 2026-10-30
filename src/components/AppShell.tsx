@@ -68,6 +68,22 @@ export function AppShell({
 
   const enlaces = (mini = false) => (
     <nav className="flex flex-col gap-4">
+      <Link
+        to="/inicio"
+        title="Inicio"
+        onClick={() => setMenuAbierto(false)}
+        className={`flex items-center gap-3 rounded-xl py-2.5 text-sm text-ink/70 transition-colors hover:bg-panel/50 ${
+          mini ? "justify-center px-0" : "px-3"
+        }`}
+        activeProps={{
+          className: `flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium bg-panel/70 text-brand ring-1 ring-brand/15 ${
+            mini ? "justify-center px-0" : "px-3"
+          }`,
+        }}
+      >
+        <span className="text-[0.8125rem]">⌂</span>
+        {!mini && "Inicio"}
+      </Link>
       {GRUPOS.map((g) => (
         <div key={g.titulo} className="flex flex-col gap-1">
           {mini ? (
