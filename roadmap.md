@@ -12,6 +12,6 @@
 - [x] Check entering, clearing and submitting manual fields and assistant questions.
 
 # ESP32 Bluetooth
-- [ ] Add BLE pairing, live readings, disconnect handling and shared connection controls.
-- [ ] Forward BLE readings to the local Flask sensor endpoint without interrupting live monitoring.
-- [ ] Test parsing, source priority and the connected interface; distinguish mocked checks from physical hardware checks.
+- [x] Add BLE pairing, live readings, disconnect handling and shared connection controls.
+- [x] Forward BLE readings to the local Flask sensor endpoint without interrupting live monitoring.
+- [x] Test parsing, source priority and the authenticated connected interface with a mocked BLE device; physical ESP32 and local Flask connectivity require the user's equipment.
