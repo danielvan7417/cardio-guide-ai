@@ -6,6 +6,8 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Restablecer contraseña — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "Define una nueva contraseña para tu cuenta de RitmoVital." },
       { property: "og:title", content: "Restablecer contraseña — RitmoVital" },
       { property: "og:description", content: "Recuperación segura de acceso a RitmoVital." },

@@ -17,6 +17,8 @@ export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Panel de monitoreo — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content:

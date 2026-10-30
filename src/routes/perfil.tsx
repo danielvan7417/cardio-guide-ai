@@ -8,6 +8,8 @@ export const Route = createFileRoute("/perfil")({
   head: () => ({
     meta: [
       { title: "Perfil y consentimiento — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content:

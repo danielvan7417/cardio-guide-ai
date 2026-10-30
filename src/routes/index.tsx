@@ -1,7 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Onda } from "@/components/Onda";
+import { Button } from "@/components/ui/button";
+import { isInvalidCredentials, MAX_FAILED_LOGINS, passwordRequirements, signupSchema } from "@/lib/access-security";
+import { useLoginCooldown } from "@/lib/use-login-cooldown";
+import { registerAccount } from "@/lib/registration.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,6 +19,8 @@ export const Route = createFileRoute("/")({
           "Accede a RitmoVital para monitorear tu frecuencia cardíaca en tiempo real, registrar síntomas y generar reportes clínicos.",
       },
       { property: "og:title", content: "Iniciar sesión — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "Monitoreo clínico de salud cardíaca en tiempo real con asistente de IA local.",
@@ -32,6 +40,16 @@ function Login() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const inFlight = useRef(false);
+  const cooldown = useLoginCooldown();
+  const register = useServerFn(registerAccount);
+  const passwordValid = passwordRequirements.every((rule) => rule.valid(clave));
+
+  const cambiarModo = (nuevo: typeof modo) => {
+    setModo(nuevo);
+    setError("");
+    setInfo("");
+  };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -45,30 +63,38 @@ function Login() {
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (inFlight.current || !cooldown.ready) return;
     setError("");
     setInfo("");
-    if (!correo.includes("@")) return setError("Ingresa un correo electrónico válido.");
-    if (modo !== "recuperar" && clave.length < 6)
-      return setError("La contraseña debe tener al menos 6 caracteres.");
+    if (modo === "entrar" && cooldown.check() > 0) return;
+    if (!correo.trim().includes("@")) return setError("Ingresa un correo electrónico válido.");
+    if (modo === "entrar" && !clave) return setError("Ingresa tu contraseña.");
     if (modo === "registro" && !consiente)
       return setError("Debes aceptar el tratamiento de datos (Ley 1581 de 2012).");
+    const signup = modo === "registro"
+      ? signupSchema.safeParse({ email: correo, password: clave, nombre, consentimiento: consiente })
+      : null;
+    if (signup && !signup.success) return setError(signup.error.issues.map((issue) => issue.message).join(". "));
+    inFlight.current = true;
     setEnviando(true);
     try {
       if (modo === "entrar") {
-        const { error } = await supabase.auth.signInWithPassword({ email: correo, password: clave });
-        if (error) throw error;
+        const { error } = await supabase.auth.signInWithPassword({ email: correo.trim(), password: clave });
+        if (error) {
+          if (isInvalidCredentials(error)) cooldown.fail();
+          throw error;
+        }
+        cooldown.reset();
       } else if (modo === "registro") {
-        const { data, error } = await supabase.auth.signUp({
-          email: correo,
-          password: clave,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { nombre, consentimiento: true },
-          },
-        });
-        if (error) throw error;
-        if (!data.session)
+        if (!signup?.success) return;
+        const result = await register({ data: signup.data });
+        if (result.error) throw new Error(result.error);
+        if (result.session) {
+          const { error } = await supabase.auth.setSession(result.session);
+          if (error) throw error;
+        } else {
           setInfo("Cuenta creada. Revisa tu correo y confirma tu cuenta para ingresar.");
+        }
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(correo, {
           redirectTo: `${window.location.origin}/reset-password`,
@@ -86,6 +112,7 @@ function Login() {
             : msg || "No se pudo completar la operación.",
       );
     } finally {
+      inFlight.current = false;
       setEnviando(false);
     }
   };
@@ -146,11 +173,27 @@ function Login() {
                 <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
                 <input
                   type="password"
+                  aria-label="Contraseña"
                   value={clave}
                   onChange={(e) => setClave(e.target.value)}
+                  autoComplete={modo === "registro" ? "new-password" : "current-password"}
+                  maxLength={modo === "registro" ? 128 : undefined}
+                  aria-describedby={modo === "registro" ? "password-requirements" : undefined}
                   className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
                   placeholder="••••••••"
                 />
+                {modo === "registro" && (
+                  <ul id="password-requirements" className="mt-1 grid gap-1 text-xs">
+                    {passwordRequirements.map((rule) => {
+                      const valid = rule.valid(clave);
+                      const Icon = valid ? Check : Circle;
+                      return <li key={rule.label} className={`flex items-center gap-2 ${valid ? "text-ok" : "text-ink/60"}`}>
+                        <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                        <span>{rule.label}{valid ? " — Cumplido" : ""}</span>
+                      </li>;
+                    })}
+                  </ul>
+                )}
               </label>
             )}
             {modo === "registro" && (
@@ -165,8 +208,18 @@ function Login() {
               </label>
             )}
 
-            {error && (
-              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20">
+            {modo === "entrar" && cooldown.seconds > 0 && (
+              <p role="status" className="rounded-xl bg-warn/10 px-3 py-2 text-[0.8125rem] text-ink ring-1 ring-warn/25">
+                Inicio de sesión bloqueado en este navegador tras 5 intentos fallidos. Podrás intentarlo de nuevo en {cooldown.seconds} s.
+              </p>
+            )}
+            {modo === "entrar" && cooldown.seconds === 0 && cooldown.attempts.failures > 0 && (
+              <p role="status" className="text-xs text-ink/60">
+                Te quedan {MAX_FAILED_LOGINS - cooldown.attempts.failures} intentos antes del bloqueo de 60 segundos.
+              </p>
+            )}
+            {error && !(modo === "entrar" && cooldown.seconds > 0) && (
+              <p role="alert" className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20">
                 {error}
               </p>
             )}
@@ -176,10 +229,10 @@ function Login() {
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
-              disabled={enviando}
-              className="rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90 disabled:opacity-60"
+              disabled={enviando || !cooldown.ready || (modo === "entrar" && cooldown.seconds > 0) || (modo === "registro" && !passwordValid)}
+              className="h-auto rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90 disabled:opacity-60"
             >
               {enviando
                 ? "Procesando…"
@@ -188,22 +241,22 @@ function Login() {
                   : modo === "registro"
                     ? "Crear cuenta"
                     : "Enviar enlace"}
-            </button>
+            </Button>
 
             <div className="flex flex-wrap items-center justify-between gap-2 text-[0.8125rem]">
               {modo === "entrar" ? (
                 <>
-                  <button type="button" onClick={() => setModo("recuperar")} className="text-brand hover:underline">
+                  <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("recuperar")} className="h-auto p-0 text-brand hover:underline">
                     ¿Olvidaste tu contraseña?
-                  </button>
-                  <button type="button" onClick={() => setModo("registro")} className="text-brand hover:underline">
+                  </Button>
+                  <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("registro")} className="h-auto p-0 text-brand hover:underline">
                     Crear cuenta
-                  </button>
+                  </Button>
                 </>
               ) : (
-                <button type="button" onClick={() => setModo("entrar")} className="text-brand hover:underline">
+                <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("entrar")} className="h-auto p-0 text-brand hover:underline">
                   ← Ya tengo cuenta
-                </button>
+                </Button>
               )}
               <span className="text-ink/45">Cifrado AES-256</span>
             </div>

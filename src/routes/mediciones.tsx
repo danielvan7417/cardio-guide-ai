@@ -11,6 +11,8 @@ export const Route = createFileRoute("/mediciones")({
   head: () => ({
     meta: [
       { title: "Mediciones — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content:
