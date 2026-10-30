@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
@@ -36,6 +36,15 @@ function Dashboard() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [mensaje, setMensaje] = useState("¿Puedo trotar hoy?");
+  const [spo2Manual, setSpo2Manual] = useState("98");
+  useEffect(() => {
+    const g = localStorage.getItem("ritmovital:spo2-manual");
+    if (g) setSpo2Manual(g);
+  }, []);
+  const cambiarSpo2 = (v: string) => {
+    setSpo2Manual(v);
+    localStorage.setItem("ritmovital:spo2-manual", v);
+  };
   const [respuesta, setRespuesta] = useState<RespuestaAsistente | null>(null);
   const [cargando, setCargando] = useState(false);
   const [errorApi, setErrorApi] = useState("");
@@ -189,8 +198,34 @@ function Dashboard() {
         <Card className="flex flex-col gap-4">
           <Etiqueta>Lectura rápida</Etiqueta>
           <div className="flex flex-col gap-3">
-            <Lectura titulo="Presión sistólica" valor="118" sufijo="mmHg" />
-            <Lectura titulo="Oxigenación (SpO₂)" valor="98%" punto />
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5">
+              <div className="min-w-0">
+                <p className="text-[0.75rem] text-ink/55">
+                  Oxigenación (SpO₂) · {dispositivo.spo2Esp32 != null ? "sensor ESP32" : "manual"}
+                </p>
+                {dispositivo.spo2Esp32 != null ? (
+                  <p className="font-display text-xl font-semibold">{dispositivo.spo2Esp32}%</p>
+                ) : (
+                  <label className="mt-1 flex items-center gap-1">
+                    <input
+                      type="number"
+                      min={50}
+                      max={100}
+                      value={spo2Manual}
+                      onChange={(e) => cambiarSpo2(e.target.value)}
+                      aria-label="Oxigenación manual (SpO₂ %)"
+                      className="w-20 rounded-lg bg-panel px-2 py-1 font-display text-xl font-semibold ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+                    />
+                    <span className="font-display text-xl font-semibold">%</span>
+                  </label>
+                )}
+              </div>
+              <span
+                className={`size-2 shrink-0 rounded-full ${
+                  (dispositivo.spo2Esp32 ?? Number(spo2Manual)) >= 95 ? "bg-ok" : "bg-warn"
+                }`}
+              />
+            </div>
             <Lectura titulo="Ritmo medio 7 días" valor="74" sufijo="BPM" />
             <Lectura titulo="Índice de masa corporal" valor={String(imc)} sufijo="IMC" />
           </div>

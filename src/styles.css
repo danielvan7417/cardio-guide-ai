@@ -156,6 +156,16 @@
     border-color: var(--color-border);
   }
 
+  /* Letra base más grande para mejorar la lectura (todo el texto escala en rem). */
+  html {
+    font-size: 112.5%;
+  }
+  @media (min-width: 1536px) {
+    html {
+      font-size: 118.75%;
+    }
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
