@@ -92,8 +92,8 @@ export function AppShell({
             <Link
               to={g.to}
               onClick={() => setMenuAbierto(false)}
-              className="px-3 pb-1 text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-ink/45 hover:text-brand"
-              activeProps={{ className: "px-3 pb-1 text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-brand" }}
+              className="mt-2 mb-1 self-start rounded-full border border-brand/25 bg-accent/60 px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand transition-colors hover:border-brand/50 hover:bg-accent"
+              activeProps={{ className: "mt-2 mb-1 self-start rounded-full border border-brand bg-brand px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand-foreground" }}
             >
               {g.titulo}
             </Link>
