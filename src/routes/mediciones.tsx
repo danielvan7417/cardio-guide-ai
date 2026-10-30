@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta, EstadoPill } from "@/components/AppShell";
 import { Onda } from "@/components/Onda";
+import { ControlBluetooth } from "@/components/ControlBluetooth";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { useMediciones } from "@/lib/datos";
 import { Trash2 } from "lucide-react";
@@ -93,7 +94,7 @@ function Mediciones() {
       titulo="Historial de mediciones"
       migas={[{ label: "Inicio", to: "/inicio" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Historial de Mediciones" }]}
       acciones={
-        <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
+        <><IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} /><ControlBluetooth /></>
       }
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">

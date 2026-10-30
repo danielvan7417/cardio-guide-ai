@@ -15,3 +15,7 @@
 
 ## Pulse visualization
 - Render BPM as a shared schematic pulse with fixed beat spacing and continuous phase-preserving cadence animation; sample history must not rescale the waveform, and BPM must never be presented as a measured ECG.
+
+## Device connectivity
+- Keep BLE sessions in the shared device store across navigation; use the standard Heart Rate GATT service with flag-aware parsing, and suspend local HTTP polling while BLE owns the source to avoid conflicting readings.
+- Forward real BLE readings to the existing local sensor endpoint with bounded requests and visible synchronization failures; forwarding must never block pulse rendering or send simulated readings as hardware data.
