@@ -4,5 +4,5 @@
 - [x] Test password rules and cooldown, and check the login screen.
 
 # Simulation waveform fix
-- [ ] Replace sample-count-dependent pulse geometry with a stable continuous waveform.
-- [ ] Verify simulation startup, changing BPM, navigation and desktop/mobile rendering.
+- [x] Replace sample-count-dependent pulse geometry with a stable continuous waveform.
+- [x] Verify simulation startup, changing BPM, navigation and desktop/mobile rendering.
