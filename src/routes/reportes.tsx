@@ -165,7 +165,7 @@ function Reportes() {
                   max={110}
                   value={reposo}
                   onChange={(e) => setReposo(e.target.value)}
-                  placeholder="BPM en reposo"
+                  placeholder="BPM"
                   className="w-28 rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
                 />
               </label>

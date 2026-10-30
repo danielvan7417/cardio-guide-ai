@@ -8,5 +8,5 @@
 - [x] Verify simulation startup, changing BPM, navigation and desktop/mobile rendering.
 
 # Empty entry fields
-- [ ] Replace preset questions and numeric entry values with placeholders; preserve actual saved profile data and live sensor values.
-- [ ] Check entering, clearing and submitting manual fields and assistant questions.
+- [x] Replace preset questions and numeric entry values with placeholders; preserve actual saved profile data and live sensor values.
+- [x] Check entering, clearing and submitting manual fields and assistant questions.

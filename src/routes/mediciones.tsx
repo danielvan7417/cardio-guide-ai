@@ -141,7 +141,7 @@ function Mediciones() {
             max={230}
             value={nuevoBpm}
             onChange={(e) => setNuevoBpm(e.target.value)}
-            placeholder="Pulso (BPM)"
+            placeholder="BPM"
             aria-label="BPM"
             className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
           />
