@@ -173,6 +173,7 @@ function Login() {
                 <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
                 <input
                   type="password"
+                  aria-label="Contraseña"
                   value={clave}
                   onChange={(e) => setClave(e.target.value)}
                   autoComplete={modo === "registro" ? "new-password" : "current-password"}

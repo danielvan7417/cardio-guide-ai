@@ -46,6 +46,6 @@ export function remainingLockSeconds(state: LoginAttempts, now: number) {
   return Math.max(0, Math.ceil((state.lockedUntil - now) / 1000));
 }
 
-export function isInvalidCredentials(error: { code?: string; message: string }) {
+export function isInvalidCredentials(error: { code?: string | undefined; message: string }) {
   return error.code === "invalid_credentials" || /invalid login credentials/i.test(error.message);
 }

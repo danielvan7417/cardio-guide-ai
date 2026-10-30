@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { failedLogin, remainingLockSeconds, signupSchema, emptyAttempts, normalizeAttempts, isInvalidCredentials } from "./access-security";
 
 const accepts = (password: string) => signupSchema.safeParse({ email: "test@example.com", password, nombre: "Test", consentimiento: true }).success;
