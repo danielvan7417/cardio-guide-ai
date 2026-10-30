@@ -34,7 +34,7 @@ function Sintomas() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [fuentePulso, setFuentePulso] = useState<"simulacion" | "manual" | "esp32">("manual");
-  const [bpmManual, setBpm] = useState(88);
+  const [bpmManual, setBpm] = useState("");
   const [contexto, setContexto] = useState<(typeof CONTEXTOS)[number]>("Reposo");
   const [seleccion, setSeleccion] = useState<string[]>(["Ninguno"]);
   const [nota, setNota] = useState("");
@@ -44,7 +44,7 @@ function Sintomas() {
   // El pulso del registro depende de la fuente elegida.
   const bpmFuente =
     fuentePulso === "manual"
-      ? bpmManual
+      ? bpmManual.trim() ? Number(bpmManual) : null
       : fuentePulso === "simulacion"
         ? dispositivo.simulacion
           ? dispositivo.bpm
@@ -69,6 +69,8 @@ function Sintomas() {
       setErrorGuardar(
         fuentePulso === "esp32"
           ? "No hay lectura del ESP32. Verifica que el sensor y el servidor local estén encendidos."
+          : fuentePulso === "manual"
+            ? "Ingresa el pulso de tu registro."
           : "Activa el modo simulación para tomar el pulso simulado.",
       );
       return;
@@ -85,6 +87,7 @@ function Sintomas() {
       return;
     }
     setNota("");
+    setBpm("");
     setSeleccion(["Ninguno"]);
   };
 
@@ -141,12 +144,14 @@ function Sintomas() {
               </span>
               {fuentePulso === "manual" ? (
                 <input
-                  type="range"
+                  type="number"
                   min={45}
                   max={185}
                   value={bpmManual}
-                  onChange={(e) => setBpm(Number(e.target.value))}
-                  className="w-full accent-[var(--brand)]"
+                  onChange={(e) => setBpm(e.target.value)}
+                  placeholder="Ingresa tu pulso (BPM)"
+                  aria-label="Pulso manual (BPM)"
+                  className="w-full rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
                 />
               ) : (
                 <p className="rounded-xl bg-panel/55 px-4 py-2.5 text-[0.8125rem] text-ink/60 ring-1 ring-ink/5">

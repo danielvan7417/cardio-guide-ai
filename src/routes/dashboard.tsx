@@ -37,8 +37,8 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
-  const [mensaje, setMensaje] = useState("¿Puedo trotar hoy?");
-  const [spo2Manual, setSpo2Manual] = useState("98");
+  const [mensaje, setMensaje] = useState("");
+  const [spo2Manual, setSpo2Manual] = useState("");
   useEffect(() => {
     const g = localStorage.getItem("ritmovital:spo2-manual");
     if (g) setSpo2Manual(g);
@@ -58,6 +58,7 @@ function Dashboard() {
   const elevado = dispositivo.alertaActiva;
 
   const preguntar = async () => {
+    if (!mensaje.trim()) return;
     setCargando(true);
     setErrorApi("");
     try {
@@ -214,6 +215,7 @@ function Dashboard() {
                       min={50}
                       max={100}
                       value={spo2Manual}
+                      placeholder="Ej. 98"
                       onChange={(e) => cambiarSpo2(e.target.value)}
                       aria-label="Oxigenación manual (SpO₂ %)"
                       className="w-20 rounded-lg bg-panel px-2 py-1 font-display text-xl font-semibold ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
@@ -224,7 +226,7 @@ function Dashboard() {
               </div>
               <span
                 className={`size-2 shrink-0 rounded-full ${
-                  (dispositivo.spo2Esp32 ?? Number(spo2Manual)) >= 95 ? "bg-ok" : "bg-warn"
+                  dispositivo.spo2Esp32 === null && !spo2Manual ? "bg-ink/20" : (dispositivo.spo2Esp32 ?? Number(spo2Manual)) >= 95 ? "bg-ok" : "bg-warn"
                 }`}
               />
             </div>
@@ -259,17 +261,19 @@ function Dashboard() {
         <Card className="flex flex-col">
           <Etiqueta>Asistente clínico</Etiqueta>
           <p className="mt-0.5 text-sm text-ink/60">
-            Consulta con IA local usando tu IMC y BPM actuales.
+            Orientación general sobre salud cardíaca; no diagnostica ni sustituye a un profesional. Ante una urgencia, busca atención médica.
           </p>
           <textarea
             value={mensaje}
             onChange={(e) => setMensaje(e.target.value)}
             rows={3}
+            aria-label="Pregunta al asistente de salud"
+            placeholder="Ej. ¿Qué significa mi pulso en reposo?"
             className="mt-3 rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
           />
           <button
             onClick={preguntar}
-            disabled={cargando}
+            disabled={cargando || !mensaje.trim()}
             className="mt-3 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90 disabled:opacity-60"
           >
             {cargando ? "Consultando…" : "Enviar consulta"}
