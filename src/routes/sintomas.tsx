@@ -10,6 +10,8 @@ export const Route = createFileRoute("/sintomas")({
   head: () => ({
     meta: [
       { title: "Diario de síntomas — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content:

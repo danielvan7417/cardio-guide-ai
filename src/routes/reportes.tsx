@@ -10,6 +10,8 @@ export const Route = createFileRoute("/reportes")({
   head: () => ({
     meta: [
       { title: "Reportes y zonas de entrenamiento — RitmoVital" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content:
