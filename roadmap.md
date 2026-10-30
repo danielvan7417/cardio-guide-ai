@@ -10,3 +10,8 @@
 # Empty entry fields
 - [x] Replace preset questions and numeric entry values with placeholders; preserve actual saved profile data and live sensor values.
 - [x] Check entering, clearing and submitting manual fields and assistant questions.
+
+# ESP32 Bluetooth
+- [ ] Add BLE pairing, live readings, disconnect handling and shared connection controls.
+- [ ] Forward BLE readings to the local Flask sensor endpoint without interrupting live monitoring.
+- [ ] Test parsing, source priority and the connected interface; distinguish mocked checks from physical hardware checks.
