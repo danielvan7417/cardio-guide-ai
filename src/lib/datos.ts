@@ -43,7 +43,21 @@ export function useMediciones(userId?: string) {
     await cargar();
   };
 
-  return { lista, cargando, agregar };
+  const eliminar = async (id: string) => {
+    if (!userId) throw new Error("Inicia sesión para borrar una medición.");
+    const { data, error } = await supabase
+      .from("mediciones")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("id")
+      .single();
+    if (error) throw error;
+    if (!data) throw new Error("No se pudo borrar la medición.");
+    setLista((actual) => actual.filter((medicion) => medicion.id !== id));
+  };
+
+  return { lista, cargando, agregar, eliminar };
 }
 
 export function useSintomas(userId?: string) {
