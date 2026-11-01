@@ -1,11 +1,22 @@
 export type Estado = "Normal" | "Elevado";
 
+export const CONTEXTOS = [
+  "Reposo",
+  "Ejercicio",
+  "Estrés",
+  "Post-ejercicio",
+  "Estimulantes",
+  "Antes de dormir",
+] as const;
+
+export type Contexto = (typeof CONTEXTOS)[number];
+
 export type Medicion = {
   id: string;
   titulo: string;
   fecha: string;
   bpm: number;
-  contexto: "Reposo" | "Ejercicio" | "Estrés";
+  contexto: Contexto;
   estado: Estado;
   createdAt?: string;
 };
@@ -14,7 +25,7 @@ export type RegistroSintoma = {
   id: string;
   fecha: string;
   bpm: number;
-  contexto: "Reposo" | "Ejercicio" | "Estrés";
+  contexto: Contexto;
   sintomas: string[];
   nota: string;
   createdAt?: string;
@@ -101,10 +112,30 @@ export function zonasEntrenamiento(edad: number, reposo = 68): ZonaEntrenamiento
     hasta: Math.round(reposo + rango * b),
   });
   return [
-    { nombre: "Calentamiento", ...z(0.5, 0.6), porcentaje: "50–60%", descripcion: "Activación suave y recuperación" },
-    { nombre: "Quema de grasa", ...z(0.6, 0.7), porcentaje: "60–70%", descripcion: "Uso predominante de grasa" },
-    { nombre: "Cardio", ...z(0.7, 0.85), porcentaje: "70–85%", descripcion: "Mejora de capacidad aeróbica" },
-    { nombre: "Pico", ...z(0.85, 1), porcentaje: "85–100%", descripcion: "Esfuerzo máximo, corta duración" },
+    {
+      nombre: "Calentamiento",
+      ...z(0.5, 0.6),
+      porcentaje: "50–60%",
+      descripcion: "Activación suave y recuperación",
+    },
+    {
+      nombre: "Quema de grasa",
+      ...z(0.6, 0.7),
+      porcentaje: "60–70%",
+      descripcion: "Uso predominante de grasa",
+    },
+    {
+      nombre: "Cardio",
+      ...z(0.7, 0.85),
+      porcentaje: "70–85%",
+      descripcion: "Mejora de capacidad aeróbica",
+    },
+    {
+      nombre: "Pico",
+      ...z(0.85, 1),
+      porcentaje: "85–100%",
+      descripcion: "Esfuerzo máximo, corta duración",
+    },
   ];
 }
 

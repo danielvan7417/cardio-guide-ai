@@ -6,10 +6,15 @@ import { ControlBluetooth } from "@/components/ControlBluetooth";
 import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { useMediciones } from "@/lib/datos";
 import { Trash2 } from "lucide-react";
+import { CONTEXTOS, type Contexto } from "@/lib/ritmo";
 import { Button } from "@/components/ui/button";
 import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 
 import { useSesion } from "@/lib/sesion";
@@ -35,7 +40,7 @@ export const Route = createFileRoute("/mediciones")({
   component: Mediciones,
 });
 
-const FILTROS = ["Todas", "Reposo", "Ejercicio", "Estrés"] as const;
+const FILTROS = ["Todas", ...CONTEXTOS] as const;
 
 function Mediciones() {
   const { sesion } = useSesion();
@@ -47,14 +52,15 @@ function Mediciones() {
   const [errorBorrado, setErrorBorrado] = useState("");
   const [titulo, setTitulo] = useState("");
   const [nuevoBpm, setNuevoBpm] = useState("");
-  const [nuevoCtx, setNuevoCtx] = useState<"Reposo" | "Ejercicio" | "Estrés">("Reposo");
+  const [nuevoCtx, setNuevoCtx] = useState<Contexto>("Reposo");
   const [aviso, setAviso] = useState("");
   if (!sesion) return null;
 
   const guardar = async (e: React.FormEvent, desdeSensor = false) => {
     e.preventDefault();
     const bpmFinal = desdeSensor ? dispositivo.bpm : Number(nuevoBpm);
-    if (!bpmFinal || bpmFinal < 30 || bpmFinal > 230) return setAviso("Pulso fuera de rango (30–230).");
+    if (!bpmFinal || bpmFinal < 30 || bpmFinal > 230)
+      return setAviso("Pulso fuera de rango (30–230).");
     try {
       await agregar({
         titulo: titulo.trim() || (desdeSensor ? "Lectura del sensor ESP32" : "Medición manual"),
@@ -92,9 +98,16 @@ function Mediciones() {
     <AppShell
       sesion={sesion}
       titulo="Historial de mediciones"
-      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Monitoreo", to: "/monitoreo" }, { label: "Historial de Mediciones" }]}
+      migas={[
+        { label: "Inicio", to: "/inicio" },
+        { label: "Monitoreo", to: "/monitoreo" },
+        { label: "Historial de Mediciones" },
+      ]}
       acciones={
-        <><IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} /><ControlBluetooth /></>
+        <>
+          <IndicadorDispositivo estado={dispositivo.estado} ultimaTrama={dispositivo.ultimaTrama} />
+          <ControlBluetooth />
+        </>
       }
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
@@ -150,10 +163,12 @@ function Mediciones() {
         </Card>
       </section>
 
-
       <Card className="mt-5">
         <Etiqueta>Registrar medición</Etiqueta>
-        <form onSubmit={(e) => guardar(e)} className="mt-4 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto_auto] sm:items-end">
+        <form
+          onSubmit={(e) => guardar(e)}
+          className="mt-4 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto_auto] sm:items-end"
+        >
           <input
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
@@ -176,11 +191,14 @@ function Mediciones() {
             aria-label="Contexto"
             className="rounded-xl bg-panel/70 px-4 py-2.5 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
           >
-            <option>Reposo</option>
-            <option>Ejercicio</option>
-            <option>Estrés</option>
+            {CONTEXTOS.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
           </select>
-          <button type="submit" className="rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90">
+          <button
+            type="submit"
+            className="rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90"
+          >
             Guardar
           </button>
           <button
@@ -241,7 +259,10 @@ function Mediciones() {
                   className="shrink-0 text-ink/50 hover:bg-alert/10 hover:text-alert"
                   aria-label={`Eliminar medición: ${m.titulo}`}
                   title="Eliminar medición"
-                  onClick={() => { setErrorBorrado(""); setPendiente(m); }}
+                  onClick={() => {
+                    setErrorBorrado("");
+                    setPendiente(m);
+                  }}
                 >
                   <Trash2 />
                 </Button>
@@ -255,7 +276,12 @@ function Mediciones() {
           )}
         </div>
       </section>
-      <AlertDialog open={pendiente !== null} onOpenChange={(abierto) => { if (!abierto && !borrando) setPendiente(null); }}>
+      <AlertDialog
+        open={pendiente !== null}
+        onOpenChange={(abierto) => {
+          if (!abierto && !borrando) setPendiente(null);
+        }}
+      >
         <AlertDialogContent className="w-[calc(100%-2rem)]">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar esta medición?</AlertDialogTitle>
@@ -263,11 +289,18 @@ function Mediciones() {
               «{pendiente?.titulo}» se borrará de tu historial. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {errorBorrado && <p role="alert" className="text-sm text-alert">{errorBorrado}</p>}
+          {errorBorrado && (
+            <p role="alert" className="text-sm text-alert">
+              {errorBorrado}
+            </p>
+          )}
           <AlertDialogFooter className="gap-2">
-            <Button variant="outline" disabled={borrando} onClick={() => setPendiente(null)}>Cancelar</Button>
+            <Button variant="outline" disabled={borrando} onClick={() => setPendiente(null)}>
+              Cancelar
+            </Button>
             <Button variant="destructive" disabled={borrando} onClick={borrar}>
-              <Trash2 />{borrando ? "Eliminando…" : "Eliminar"}
+              <Trash2 />
+              {borrando ? "Eliminando…" : "Eliminar"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

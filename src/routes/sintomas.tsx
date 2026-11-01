@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
-import { estadoDe } from "@/lib/ritmo";
+import { CONTEXTOS, estadoDe, type Contexto } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
 import { useSintomas } from "@/lib/datos";
 import { useDispositivo } from "@/lib/dispositivo";
@@ -27,15 +27,15 @@ export const Route = createFileRoute("/sintomas")({
   component: Sintomas,
 });
 
-const CONTEXTOS = ["Reposo", "Ejercicio", "Estrés"] as const;
-const SINTOMAS = ["Mareo", "Fatiga", "Dolor de cabeza", "Palpitaciones", "Ninguno"];
+const SINTOMAS_COMUNES = ["Mareo", "Fatiga", "Dolor de cabeza", "Palpitaciones"];
+const SINTOMAS_ALERTA = ["Dolor en el pecho", "Falta de aire", "Sudor frío"];
 
 function Sintomas() {
   const { sesion } = useSesion();
   const dispositivo = useDispositivo();
   const [fuentePulso, setFuentePulso] = useState<"simulacion" | "manual" | "esp32">("manual");
   const [bpmManual, setBpm] = useState("");
-  const [contexto, setContexto] = useState<(typeof CONTEXTOS)[number]>("Reposo");
+  const [contexto, setContexto] = useState<Contexto>("Reposo");
   const [seleccion, setSeleccion] = useState<string[]>(["Ninguno"]);
   const [nota, setNota] = useState("");
   const { lista: bitacora, agregar, eliminar, eliminarTodas } = useSintomas(sesion?.id);
@@ -63,6 +63,30 @@ function Sintomas() {
       return sin.includes(s) ? sin.filter((x) => x !== s) : [...sin, s];
     });
   };
+
+  const botonSintoma = (s: string, esAlerta: boolean) => {
+    const activo = seleccion.includes(s);
+    const estilo = activo
+      ? esAlerta
+        ? "bg-alert/12 text-alert ring-alert/30"
+        : "bg-warn/12 text-warn ring-warn/30"
+      : esAlerta
+        ? "bg-panel/60 text-ink/70 ring-alert/25 hover:bg-alert/5"
+        : "bg-panel/60 text-ink/70 ring-ink/5 hover:bg-panel/80";
+    return (
+      <button
+        key={s}
+        type="button"
+        onClick={() => alternar(s)}
+        aria-pressed={activo}
+        className={`rounded-xl px-3 py-2 text-sm ring-1 ${estilo}`}
+      >
+        {s}
+      </button>
+    );
+  };
+
+  const alertaSeleccionada = seleccion.some((s) => SINTOMAS_ALERTA.includes(s));
 
   const guardar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,22 +225,18 @@ function Sintomas() {
                 Síntomas
               </span>
               <div className="mt-2 flex flex-wrap gap-2">
-                {SINTOMAS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => alternar(s)}
-                    aria-pressed={seleccion.includes(s)}
-                    className={`rounded-xl px-3 py-2 text-sm ring-1 ${
-                      seleccion.includes(s)
-                        ? "bg-warn/12 text-warn ring-warn/30"
-                        : "bg-panel/60 text-ink/70 ring-ink/5 hover:bg-panel/80"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
+                {[...SINTOMAS_COMUNES, "Ninguno"].map((s) => botonSintoma(s, false))}
+                {SINTOMAS_ALERTA.map((s) => botonSintoma(s, true))}
               </div>
+              {alertaSeleccionada && (
+                <p
+                  role="alert"
+                  className="mt-3 rounded-xl bg-alert/10 p-3 text-sm text-alert ring-1 ring-alert/30"
+                >
+                  Algunos síntomas seleccionados pueden requerir atención médica inmediata. Si los
+                  sientes ahora, busca atención de urgencia.
+                </p>
+              )}
             </div>
 
             <label className="flex flex-col gap-1.5">
