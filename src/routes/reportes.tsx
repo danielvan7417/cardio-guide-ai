@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { zonasEntrenamiento } from "@/lib/ritmo";
@@ -196,8 +196,9 @@ function Reportes() {
                 </div>
                 <p className="mt-2 text-[0.75rem] text-ink/55">{z.descripcion}</p>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Card>
       </section>
     </AppShell>
