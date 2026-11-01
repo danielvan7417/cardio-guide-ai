@@ -8,7 +8,8 @@ export const Route = createFileRoute("/inicio")({
       { title: "Bienvenido a RitmoVital — Salud cardíaca" },
       {
         name: "description",
-        content: "Conoce RitmoVital: qué es, en qué se basa y qué funciones ofrece para cuidar tu corazón.",
+        content:
+          "Conoce RitmoVital: qué es, en qué se basa y qué funciones ofrece para cuidar tu corazón.",
       },
       { property: "og:title", content: "Bienvenido a RitmoVital — Salud cardíaca" },
       {
@@ -23,23 +24,49 @@ export const Route = createFileRoute("/inicio")({
 });
 
 const FUNCIONES = [
-  { icono: "◉", titulo: "Panel Principal", texto: "Resumen de salud, tendencia semanal, alertas recientes y asistente clínico.", to: "/dashboard" },
-  { icono: "⌁", titulo: "Centro de monitoreo", texto: "Pulso en vivo, conexión del ESP32 y controles de adquisición.", to: "/monitoreo" },
-  { icono: "▤", titulo: "Historial de mediciones", texto: "Todas tus lecturas guardadas, filtrables por contexto.", to: "/mediciones" },
-  { icono: "✚", titulo: "Diario de síntomas", texto: "Registra pulso, contexto (reposo, ejercicio, estrés), síntomas y notas.", to: "/sintomas" },
-  { icono: "▦", titulo: "Reportes y zonas", texto: "Exporta tu historial y calcula tus zonas de entrenamiento cardíaco.", to: "/reportes" },
-  { icono: "◐", titulo: "Perfil biométrico", texto: "Edad, peso, estatura, tipo de sangre y FC en reposo.", to: "/perfil" },
+  {
+    icono: "◉",
+    titulo: "Panel Principal",
+    texto: "Resumen de salud, tendencia semanal, alertas recientes y asistente clínico.",
+    to: "/dashboard",
+  },
+  {
+    icono: "⌁",
+    titulo: "Centro de monitoreo",
+    texto: "Pulso en vivo, conexión del ESP32 y controles de adquisición.",
+    to: "/monitoreo",
+  },
+  {
+    icono: "▤",
+    titulo: "Historial de mediciones",
+    texto: "Todas tus lecturas guardadas, filtrables por contexto.",
+    to: "/mediciones",
+  },
+  {
+    icono: "✚",
+    titulo: "Diario de síntomas",
+    texto: "Registra pulso, contexto (reposo, ejercicio, estrés), síntomas y notas.",
+    to: "/sintomas",
+  },
+  {
+    icono: "▦",
+    titulo: "Reportes y zonas",
+    texto: "Exporta tu historial y calcula tus zonas de entrenamiento cardíaco.",
+    to: "/reportes",
+  },
+  {
+    icono: "◐",
+    titulo: "Perfil biométrico",
+    texto: "Edad, peso, estatura, tipo de sangre y FC en reposo.",
+    to: "/perfil",
+  },
 ] as const;
 
 function Inicio() {
   const { sesion } = useSesion();
   if (!sesion) return null;
   return (
-    <AppShell
-      sesion={sesion}
-      titulo="Bienvenido a RitmoVital"
-      migas={[{ label: "Inicio" }]}
-    >
+    <AppShell sesion={sesion} titulo="Bienvenido a RitmoVital" migas={[{ label: "Inicio" }]}>
       <Link
         to="/perfil"
         className="mt-5 flex flex-col gap-3 rounded-2xl bg-accent px-5 py-4 ring-1 ring-brand/30 transition hover:ring-brand sm:flex-row sm:items-center sm:justify-between"
@@ -66,8 +93,8 @@ function Inicio() {
           </p>
           <p className="mt-4 text-base leading-relaxed text-ink/70">
             RitmoVital es una plataforma de monitoreo de salud cardíaca. Recibe el pulso desde un
-            sensor físico (ESP32), lo muestra al instante, detecta cuando supera un umbral seguro y te
-            permite consultar a un asistente con inteligencia artificial que corre en tu propio
+            sensor físico (ESP32), lo muestra al instante, detecta cuando supera un umbral seguro y
+            te permite consultar a un asistente con inteligencia artificial que corre en tu propio
             computador, usando tu IMC y tu pulso actual.
           </p>
         </Card>
@@ -75,7 +102,10 @@ function Inicio() {
           <Etiqueta>En qué se basa</Etiqueta>
           <ul className="mt-3 flex flex-col gap-3 text-base text-ink/75">
             <li>• Sensor ESP32 que envía tu pulso en vivo.</li>
-            <li>• Regla clínica fija: alerta cuando el pulso supera el umbral.</li>
+            <li>
+              • Umbral personal: alerta cuando el pulso supera el límite que configuras en tu
+              perfil.
+            </li>
             <li>• Zonas cardíacas calculadas con tu edad y FC en reposo.</li>
             <li>• Asistente de IA local: tus consultas no salen de tu equipo.</li>
             <li>• Datos protegidos según la Ley 1581 de 2012.</li>
@@ -96,15 +126,18 @@ function Inicio() {
             </span>
             <p className="font-display text-lg font-semibold">{f.titulo}</p>
             <p className="text-base text-ink/65">{f.texto}</p>
-            <span className="mt-auto text-sm font-medium text-brand group-hover:underline">Abrir →</span>
+            <span className="mt-auto text-sm font-medium text-brand group-hover:underline">
+              Abrir →
+            </span>
           </Link>
         ))}
       </section>
 
       <Card className="mt-5">
         <p className="text-base text-ink/70">
-          <strong>Importante:</strong> RitmoVital es una herramienta de acompañamiento y no reemplaza
-          la valoración de un profesional de la salud. Ante una alerta persistente, consulta a tu médico.
+          <strong>Importante:</strong> RitmoVital es una herramienta de acompañamiento y no
+          reemplaza la valoración de un profesional de la salud. Ante una alerta persistente,
+          consulta a tu médico.
         </p>
       </Card>
     </AppShell>

@@ -45,6 +45,10 @@ function Perfil() {
       setAviso("Debes autorizar el tratamiento de datos para guardar los cambios.");
       return;
     }
+    if (form.umbralAlertaBpm < 60 || form.umbralAlertaBpm > 220) {
+      setAviso("El límite de alerta debe estar entre 60 y 220 BPM.");
+      return;
+    }
     try {
       await guardarSesion(form);
       if (clave) {
@@ -64,7 +68,11 @@ function Perfil() {
     <AppShell
       sesion={sesion}
       titulo="Gestión de perfil"
-      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Configuración", to: "/configuracion" }, { label: "Perfil de Usuario" }]}
+      migas={[
+        { label: "Inicio", to: "/inicio" },
+        { label: "Configuración", to: "/configuracion" },
+        { label: "Perfil de Usuario" },
+      ]}
     >
       <form onSubmit={enviar} className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -142,6 +150,21 @@ function Perfil() {
               />
               <span className="text-[0.75rem] text-ink/55">
                 Tómate el pulso al despertar, en reposo, durante 1 minuto.
+              </span>
+            </Campo>
+            <Campo label="Límite de alerta de pulso (BPM)">
+              <input
+                type="number"
+                min={60}
+                max={220}
+                value={form.umbralAlertaBpm || ""}
+                placeholder="Ej. 120"
+                onChange={(e) => set("umbralAlertaBpm", Number(e.target.value) || 0)}
+                className={inputCls}
+              />
+              <span className="text-[0.75rem] text-ink/55">
+                Pulso a partir del cual se activa una alerta. Si tu médico te indicó un valor, ponlo
+                aquí.
               </span>
             </Campo>
             <Campo label="Nueva contraseña">

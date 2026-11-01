@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { cerrarSesion, type Sesion } from "@/lib/sesion";
+import { fijarUmbralAlerta } from "@/lib/dispositivo";
 
 type NavItem = { to: string; label: string; icon: string };
 type Grupo = { titulo: string; to: string; items: NavItem[] };
@@ -51,6 +52,10 @@ export function AppShell({
   const [colapsada, setColapsada] = useState(false);
 
   useEffect(() => {
+    fijarUmbralAlerta(sesion.umbralAlertaBpm);
+  }, [sesion.umbralAlertaBpm]);
+
+  useEffect(() => {
     setColapsada(localStorage.getItem(CLAVE_SIDEBAR) === "1");
   }, []);
 
@@ -93,7 +98,10 @@ export function AppShell({
               to={g.to}
               onClick={() => setMenuAbierto(false)}
               className="mt-2 mb-1 self-start rounded-full border border-brand/25 bg-accent/60 px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand transition-colors hover:border-brand/50 hover:bg-accent"
-              activeProps={{ className: "mt-2 mb-1 self-start rounded-full border border-brand bg-brand px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand-foreground" }}
+              activeProps={{
+                className:
+                  "mt-2 mb-1 self-start rounded-full border border-brand bg-brand px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-brand-foreground",
+              }}
             >
               {g.titulo}
             </Link>
@@ -200,14 +208,19 @@ export function AppShell({
             </div>
           )}
 
-
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <nav aria-label="Ruta de navegación" className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-ink/55">
+              <nav
+                aria-label="Ruta de navegación"
+                className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-ink/55"
+              >
                 {migas.map((m, i) => (
                   <span key={`${m.label}-${i}`} className="flex items-center gap-2">
                     {m.to ? (
-                      <Link to={m.to} className="text-brand transition-colors hover:text-sky-600 hover:underline">
+                      <Link
+                        to={m.to}
+                        className="text-brand transition-colors hover:text-sky-600 hover:underline"
+                      >
                         {m.label}
                       </Link>
                     ) : (
@@ -230,7 +243,8 @@ export function AppShell({
                 onClick={volver}
                 className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               >
-                <span className="text-[0.8125rem]">←</span> {padre ? `Volver a ${padre.label}` : "Volver"}
+                <span className="text-[0.8125rem]">←</span>{" "}
+                {padre ? `Volver a ${padre.label}` : "Volver"}
               </button>
             </div>
           </header>
@@ -261,13 +275,7 @@ function Marca() {
   );
 }
 
-export function Card({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div className={`glass rounded-[20px] p-5 ring-1 ring-ink/5 sm:p-6 2xl:p-8 ${className}`}>
       {children}
@@ -276,9 +284,7 @@ export function Card({
 }
 
 export function Etiqueta({ children }: { children: ReactNode }) {
-  return (
-    <p className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">{children}</p>
-  );
+  return <p className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">{children}</p>;
 }
 
 export function EstadoPill({ estado }: { estado: "Normal" | "Elevado" }) {

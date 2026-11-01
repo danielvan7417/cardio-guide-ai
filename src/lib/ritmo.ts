@@ -31,7 +31,7 @@ export type RegistroSintoma = {
   createdAt?: string;
 };
 
-export const UMBRAL_BPM = 120;
+export const UMBRAL_BPM_POR_DEFECTO = 120;
 
 export const estadoDe = (bpm: number): Estado => (bpm >= 100 ? "Elevado" : "Normal");
 

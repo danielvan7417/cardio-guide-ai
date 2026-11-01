@@ -1,12 +1,16 @@
 import { useSyncExternalStore } from "react";
-import { UMBRAL_BPM } from "@/lib/ritmo";
-import { bluetoothDisponible, leerPulsoBLE, SERVICIO_PULSO, CARACTERISTICA_PULSO, type DispositivoBLE, type CaracteristicaBLE } from "@/lib/bluetooth";
+import { UMBRAL_BPM_POR_DEFECTO } from "@/lib/ritmo";
+import {
+  bluetoothDisponible,
+  leerPulsoBLE,
+  SERVICIO_PULSO,
+  CARACTERISTICA_PULSO,
+  type DispositivoBLE,
+  type CaracteristicaBLE,
+} from "@/lib/bluetooth";
 
 export type EstadoDispositivo =
-  | "Buscando dispositivo"
-  | "Conectado"
-  | "Transmitiendo Live"
-  | "Desconectado";
+  "Buscando dispositivo" | "Conectado" | "Transmitiendo Live" | "Desconectado";
 
 /** Endpoint donde el ESP32 publica sus tramas y desde donde la interfaz las lee. */
 export const SENSOR_URL = "http://127.0.0.1:5000/api/sensor";
@@ -37,6 +41,7 @@ type EstadoStore = {
   vinculandoBLE: boolean;
   errorBLE: string;
   sincronizacionBLE: "inactiva" | "enviando" | "sincronizada" | "error";
+  umbralBpm: number;
 };
 
 const MAX_MUESTRAS = 48;
@@ -60,6 +65,7 @@ const INICIAL: EstadoStore = {
   vinculandoBLE: false,
   errorBLE: "",
   sincronizacionBLE: "inactiva",
+  umbralBpm: UMBRAL_BPM_POR_DEFECTO,
 };
 
 /* Store global: vive mientras la app está abierta, así el modo simulación
@@ -84,7 +90,12 @@ async function enviarLecturaBLE(bpm: number) {
     const res = await fetch(SENSOR_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bpm, dispositivo: "ESP32-BLE", alerta_activa: bpm >= UMBRAL_BPM, timestamp: new Date().toISOString() }),
+      body: JSON.stringify({
+        bpm,
+        dispositivo: "ESP32-BLE",
+        alerta_activa: bpm >= state.umbralBpm,
+        timestamp: new Date().toISOString(),
+      }),
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) throw new Error("No se pudo sincronizar");
@@ -126,15 +137,25 @@ function limpiarBLE() {
 export function desconectarBLE() {
   limpiarBLE();
   fallos = 0;
-  set({ bleConectado: false, vinculandoBLE: false, fuente: null, bpmEsp32: null, spo2Esp32: null,
-    sincronizacionBLE: "inactiva", ...(state.simulacion ? {} : { estado: "Desconectado" }) });
+  set({
+    bleConectado: false,
+    vinculandoBLE: false,
+    fuente: null,
+    bpmEsp32: null,
+    spo2Esp32: null,
+    sincronizacionBLE: "inactiva",
+    ...(state.simulacion ? {} : { estado: "Desconectado" }),
+  });
 }
 
 export async function conectarBLE() {
   if (state.vinculandoBLE || state.bleConectado) return;
   const api = bluetoothDisponible();
   if (!api) {
-    set({ errorBLE: "Bluetooth requiere Chrome o Edge compatible y una conexión HTTPS (o localhost). No está disponible en este navegador." });
+    set({
+      errorBLE:
+        "Bluetooth requiere Chrome o Edge compatible y una conexión HTTPS (o localhost). No está disponible en este navegador.",
+    });
     return;
   }
   set({ vinculandoBLE: true, errorBLE: "" });
@@ -148,14 +169,24 @@ export async function conectarBLE() {
     caracteristicaBLE = await service.getCharacteristic(CARACTERISTICA_PULSO);
     caracteristicaBLE.addEventListener("characteristicvaluechanged", recibirBLE);
     // Own the source before enabling notifications, including notifications emitted immediately.
-    set({ bleConectado: true, fuente: "ble", bpmEsp32: null, spo2Esp32: null,
-      sincronizacionBLE: "inactiva", ...(state.simulacion ? {} : { estado: "Conectado", muestras: [], tiemposMuestras: [] }) });
+    set({
+      bleConectado: true,
+      fuente: "ble",
+      bpmEsp32: null,
+      spo2Esp32: null,
+      sincronizacionBLE: "inactiva",
+      ...(state.simulacion ? {} : { estado: "Conectado", muestras: [], tiemposMuestras: [] }),
+    });
     ultimaLecturaBLE = Date.now();
     await caracteristicaBLE.startNotifications();
   } catch (error) {
     const cancelado = error instanceof Error && error.name === "NotFoundError";
     desconectarBLE();
-    set({ errorBLE: cancelado ? "" : "No se pudo vincular el ESP32. Comprueba que anuncie el servicio de frecuencia cardíaca y no esté conectado a otro dispositivo." });
+    set({
+      errorBLE: cancelado
+        ? ""
+        : "No se pudo vincular el ESP32. Comprueba que anuncie el servicio de frecuencia cardíaca y no esté conectado a otro dispositivo.",
+    });
   } finally {
     set({ vinculandoBLE: false });
   }
@@ -184,11 +215,20 @@ async function leerSensor() {
     if (!res.ok) throw new Error(String(res.status));
     const trama = (await res.json()) as TramaSensor;
     if (state.bleConectado) return;
-    if (typeof trama.bpm !== "number" || !Number.isFinite(trama.bpm) || trama.bpm <= 0) throw new Error("trama inválida");
+    if (typeof trama.bpm !== "number" || !Number.isFinite(trama.bpm) || trama.bpm <= 0)
+      throw new Error("trama inválida");
     fallos = 0;
     const v = Math.round(trama.bpm);
-    const spo2 = typeof trama.spo2 === "number" && Number.isFinite(trama.spo2) && trama.spo2 > 0 && trama.spo2 <= 100 ? Math.round(trama.spo2) : null;
-    set({ fuente: "wifi", spo2Esp32: spo2,
+    const spo2 =
+      typeof trama.spo2 === "number" &&
+      Number.isFinite(trama.spo2) &&
+      trama.spo2 > 0 &&
+      trama.spo2 <= 100
+        ? Math.round(trama.spo2)
+        : null;
+    set({
+      fuente: "wifi",
+      spo2Esp32: spo2,
       ...(spo2 === null ? {} : { ultimaOxigenacion: { valor: spo2, recibida: Date.now() } }),
     });
     if (state.simulacion) set({ bpmEsp32: v });
@@ -244,7 +284,13 @@ export function activarSimulacion(v: boolean) {
   fallos = 0;
   set({
     simulacion: v,
-    estado: v ? "Conectado" : state.bpmEsp32 !== null ? "Transmitiendo Live" : state.bleConectado ? "Conectado" : "Buscando dispositivo",
+    estado: v
+      ? "Conectado"
+      : state.bpmEsp32 !== null
+        ? "Transmitiendo Live"
+        : state.bleConectado
+          ? "Conectado"
+          : "Buscando dispositivo",
     muestras: [],
     tiemposMuestras: [],
   });
@@ -255,6 +301,10 @@ export function activarSimulacion(v: boolean) {
 export function setBpmSimulado(valor: number) {
   window.localStorage.setItem(CLAVE_BPM_SIMULADO, String(valor));
   set({ bpmSimulado: valor });
+}
+
+export function fijarUmbralAlerta(valor: number) {
+  set({ umbralBpm: valor });
 }
 
 export function useDispositivo() {
@@ -269,7 +319,7 @@ export function useDispositivo() {
     setBpmSimulado,
     conectarBLE,
     desconectarBLE,
-    alertaActiva: s.bpm >= UMBRAL_BPM,
+    alertaActiva: s.bpm >= s.umbralBpm,
     enVivo: s.estado === "Transmitiendo Live",
   };
 }
@@ -310,7 +360,9 @@ export function IndicadorDispositivo({
       {compacto
         ? estado.replace("Transmitiendo ", "")
         : estado === "Conectado"
-          ? simulacion ? "Simulación activa" : "ESP32 · Conectado · esperando pulso"
+          ? simulacion
+            ? "Simulación activa"
+            : "ESP32 · Conectado · esperando pulso"
           : `ESP32 · ${estado}`}
       {!compacto && ultimaTrama && <span className="text-ink/45">· {ultimaTrama}</span>}
     </span>

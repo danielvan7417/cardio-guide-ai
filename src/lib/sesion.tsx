@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { UMBRAL_BPM_POR_DEFECTO } from "@/lib/ritmo";
 
 export type Sesion = {
   id: string;
@@ -12,6 +13,7 @@ export type Sesion = {
   estatura: number;
   consentimiento: boolean;
   fcReposo: number;
+  umbralAlertaBpm: number;
 };
 
 const EVENTO = "ritmovital:sesion";
@@ -30,6 +32,7 @@ export async function leerSesion(): Promise<Sesion | null> {
     estatura: Number(data?.estatura ?? 0),
     consentimiento: data?.consentimiento ?? false,
     fcReposo: data?.fc_reposo ?? 0,
+    umbralAlertaBpm: data?.umbral_alerta_bpm ?? UMBRAL_BPM_POR_DEFECTO,
   };
 }
 
@@ -44,6 +47,7 @@ export async function guardarSesion(s: Sesion) {
     estatura: s.estatura,
     consentimiento: s.consentimiento,
     fc_reposo: s.fcReposo,
+    umbral_alerta_bpm: s.umbralAlertaBpm,
   });
   if (error) throw error;
   window.dispatchEvent(new Event(EVENTO));
@@ -72,7 +76,8 @@ export function useSesion(protegida = true) {
   useEffect(() => {
     refrescar();
     const { data: sub } = supabase.auth.onAuthStateChange((evento) => {
-      if (evento === "SIGNED_IN" || evento === "SIGNED_OUT" || evento === "USER_UPDATED") refrescar();
+      if (evento === "SIGNED_IN" || evento === "SIGNED_OUT" || evento === "USER_UPDATED")
+        refrescar();
     });
     const h = () => refrescar();
     window.addEventListener(EVENTO, h);
