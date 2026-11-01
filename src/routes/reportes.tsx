@@ -143,35 +143,43 @@ function Reportes() {
                 Frecuencia máxima estimada: <strong className="font-display">{fcMax === null ? "—" : `${fcMax} BPM`}</strong>
               </p>
             </div>
-            <div className="flex gap-3">
-              <label className="flex flex-col gap-1.5">
-                <span className="text-[0.75rem] text-ink/55">Edad</span>
-                <input
-                  type="number"
-                  min={12}
-                  max={95}
-                  value={edad}
-                  onChange={(e) => setEdad(e.target.value)}
-                  placeholder="Años"
-                  className="w-24 rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
-                />
-              </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-[0.75rem] text-ink/55">FC en reposo</span>
-                <input
-                  type="number"
-                  min={35}
-                  max={110}
-                  value={reposo}
-                  onChange={(e) => setReposo(e.target.value)}
-                  placeholder="BPM"
-                  className="w-28 rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
-                />
-              </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="rounded-xl bg-panel/60 px-4 py-2 ring-1 ring-ink/10">
+                <p className="text-[0.75rem] text-ink/55">Edad (perfil)</p>
+                <p className="font-display text-base font-semibold">{sesion.edad > 0 ? `${sesion.edad} años` : "—"}</p>
+              </div>
+              <div className="rounded-xl bg-panel/60 px-4 py-2 ring-1 ring-ink/10">
+                <p className="text-[0.75rem] text-ink/55">BPM en reposo (perfil)</p>
+                <p className="font-display text-base font-semibold">{sesion.fcReposo > 0 ? `${sesion.fcReposo} BPM` : "—"}</p>
+              </div>
+              <Link
+                to="/perfil"
+                className="rounded-xl bg-panel/60 px-4 py-2.5 text-sm font-medium text-ink/80 ring-1 ring-ink/10 hover:bg-panel/80"
+              >
+                Editar perfil
+              </Link>
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-3">
+          {!tieneDatos ? (
+            <div className="mt-5 rounded-xl bg-accent/50 px-4 py-3.5 ring-1 ring-brand/20">
+              <p className="text-sm text-ink/75">
+                {sesion.edad === 0 && sesion.fcReposo === 0
+                  ? "Aún no has guardado tu edad ni tu BPM en reposo en el perfil."
+                  : sesion.edad === 0
+                    ? "Aún no has guardado tu edad en el perfil."
+                    : "Aún no has guardado tu BPM en reposo en el perfil."}{" "}
+                Complétalos una sola vez y las zonas se calcularán automáticamente aquí.
+              </p>
+              <Link
+                to="/perfil"
+                className="mt-2 inline-flex rounded-xl bg-brand px-4 py-2 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
+              >
+                Ir a mi perfil
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-5 flex flex-col gap-3">
             {zonas.map((z, i) => (
               <div key={z.nombre} className="rounded-xl bg-panel/55 p-4 ring-1 ring-ink/5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
