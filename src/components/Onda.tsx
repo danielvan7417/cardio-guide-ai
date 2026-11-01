@@ -15,11 +15,13 @@ export function Onda({
   muestras = [],
   activa = true,
   alerta = false,
+  pausada = false,
 }: {
   alto?: string;
   muestras?: number[];
   activa?: boolean;
   alerta?: boolean;
+  pausada?: boolean;
 }) {
   const track = useRef<HTMLDivElement>(null);
   const animation = useRef<Animation | null>(null);
@@ -27,6 +29,8 @@ export function Onda({
   const bpm = typeof lastReading === "number" && Number.isFinite(lastReading) && lastReading > 0
     ? lastReading : BASE_BPM;
   const cadence = useRef(bpm);
+  const frozen = useRef(pausada);
+  frozen.current = pausada;
 
   useEffect(() => {
     cadence.current = bpm;
@@ -47,6 +51,7 @@ export function Onda({
         { duration: BEATS_PER_LOOP * 60_000 / BASE_BPM, iterations: Infinity, easing: "linear" },
       );
       animation.current.updatePlaybackRate(cadence.current / BASE_BPM);
+      if (frozen.current) animation.current.pause();
     };
     sync();
     reducedMotion.addEventListener("change", sync);
@@ -57,11 +62,16 @@ export function Onda({
     };
   }, [activa]);
 
+  useEffect(() => {
+    if (pausada) animation.current?.pause();
+    else animation.current?.play();
+  }, [pausada, activa]);
+
   return (
     <div
       className={`rv-waveform relative ${alto} overflow-hidden rounded-[14px] bg-brand/5 ring-1 ring-brand/10 ${alerta ? "rv-waveform-alert" : ""}`}
       role="img"
-      aria-label={activa ? "Representación ilustrativa del ritmo cardíaco" : "Ritmo cardíaco sin señal activa"}
+      aria-label={pausada ? "Pulso esquemático congelado" : activa ? "Representación ilustrativa del ritmo cardíaco" : "Ritmo cardíaco sin señal activa"}
       title="Representación ilustrativa basada en BPM; no es un electrocardiograma."
     >
       <div ref={track} className={`absolute inset-y-0 left-0 w-[200%] ${activa ? "opacity-90" : "opacity-40"}`}>

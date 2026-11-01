@@ -23,6 +23,8 @@ type EstadoStore = {
   estado: EstadoDispositivo;
   bpm: number;
   muestras: number[];
+  tiemposMuestras: number[];
+  ultimaOxigenacion: { valor: number; recibida: number } | null;
   ultimaTrama: string;
   simulacion: boolean;
   bpmSimulado: number;
@@ -46,6 +48,8 @@ const INICIAL: EstadoStore = {
   estado: "Buscando dispositivo",
   bpm: 72,
   muestras: [],
+  tiemposMuestras: [],
+  ultimaOxigenacion: null,
   ultimaTrama: "",
   simulacion: false,
   bpmSimulado: 72,
@@ -145,7 +149,7 @@ export async function conectarBLE() {
     caracteristicaBLE.addEventListener("characteristicvaluechanged", recibirBLE);
     // Own the source before enabling notifications, including notifications emitted immediately.
     set({ bleConectado: true, fuente: "ble", bpmEsp32: null, spo2Esp32: null,
-      sincronizacionBLE: "inactiva", ...(state.simulacion ? {} : { estado: "Conectado", muestras: [] }) });
+      sincronizacionBLE: "inactiva", ...(state.simulacion ? {} : { estado: "Conectado", muestras: [], tiemposMuestras: [] }) });
     ultimaLecturaBLE = Date.now();
     await caracteristicaBLE.startNotifications();
   } catch (error) {
@@ -166,6 +170,7 @@ function empujar(valor: number, extra: Partial<EstadoStore> = {}) {
   set({
     bpm: valor,
     muestras: [...state.muestras, valor].slice(-MAX_MUESTRAS),
+    tiemposMuestras: [...state.tiemposMuestras, Date.now()].slice(-MAX_MUESTRAS),
     ultimaTrama: new Date().toLocaleTimeString("es-CO"),
     ...extra,
   });
@@ -182,7 +187,10 @@ async function leerSensor() {
     if (typeof trama.bpm !== "number" || !Number.isFinite(trama.bpm) || trama.bpm <= 0) throw new Error("trama inválida");
     fallos = 0;
     const v = Math.round(trama.bpm);
-    set({ fuente: "wifi", spo2Esp32: typeof trama.spo2 === "number" && Number.isFinite(trama.spo2) ? Math.round(trama.spo2) : null });
+    const spo2 = typeof trama.spo2 === "number" && Number.isFinite(trama.spo2) && trama.spo2 > 0 && trama.spo2 <= 100 ? Math.round(trama.spo2) : null;
+    set({ fuente: "wifi", spo2Esp32: spo2,
+      ...(spo2 === null ? {} : { ultimaOxigenacion: { valor: spo2, recibida: Date.now() } }),
+    });
     if (state.simulacion) set({ bpmEsp32: v });
     else empujar(v, { estado: "Transmitiendo Live", bpmEsp32: v });
   } catch {
@@ -238,6 +246,7 @@ export function activarSimulacion(v: boolean) {
     simulacion: v,
     estado: v ? "Conectado" : state.bpmEsp32 !== null ? "Transmitiendo Live" : state.bleConectado ? "Conectado" : "Buscando dispositivo",
     muestras: [],
+    tiemposMuestras: [],
   });
   if (v) empujar(state.bpmSimulado);
   else if (state.bpmEsp32 !== null) empujar(state.bpmEsp32);

@@ -23,7 +23,8 @@ export const Route = createFileRoute("/inicio")({
 });
 
 const FUNCIONES = [
-  { icono: "◉", titulo: "Panel en tiempo real", texto: "Onda de pulso en vivo, estado óptimo o de alerta y tendencia semanal.", to: "/dashboard" },
+  { icono: "◉", titulo: "Panel Principal", texto: "Resumen de salud, tendencia semanal, alertas recientes y asistente clínico.", to: "/dashboard" },
+  { icono: "⌁", titulo: "Centro de monitoreo", texto: "Pulso en vivo, conexión del ESP32 y controles de adquisición.", to: "/monitoreo" },
   { icono: "▤", titulo: "Historial de mediciones", texto: "Todas tus lecturas guardadas, filtrables por contexto.", to: "/mediciones" },
   { icono: "✚", titulo: "Diario de síntomas", texto: "Registra pulso, contexto (reposo, ejercicio, estrés), síntomas y notas.", to: "/sintomas" },
   { icono: "▦", titulo: "Reportes y zonas", texto: "Exporta tu historial y calcula tus zonas de entrenamiento cardíaco.", to: "/reportes" },

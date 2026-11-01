@@ -14,6 +14,7 @@
 - Keep the accepted browser-only login cooldown in localStorage, synchronized across tabs; count invalid credentials only, not service failures, and never store passwords.
 
 ## Pulse visualization
+- Keep dashboard analytics derived from saved readings, and hardware controls on Monitoreo; export BPM with reception timestamps, not fabricated ECG voltage, and distinguish reception Hz from sensor sampling.
 - Render BPM as a shared schematic pulse with fixed beat spacing and continuous phase-preserving cadence animation; sample history must not rescale the waveform, and BPM must never be presented as a measured ECG.
 
 ## Device connectivity
