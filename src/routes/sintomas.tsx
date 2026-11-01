@@ -225,8 +225,9 @@ function Sintomas() {
                 Síntomas
               </span>
               <div className="mt-2 flex flex-wrap gap-2">
-                {[...SINTOMAS_COMUNES, "Ninguno"].map((s) => botonSintoma(s, false))}
+                {SINTOMAS_COMUNES.map((s) => botonSintoma(s, false))}
                 {SINTOMAS_ALERTA.map((s) => botonSintoma(s, true))}
+                {botonSintoma("Ninguno", false)}
               </div>
               {alertaSeleccionada && (
                 <p
