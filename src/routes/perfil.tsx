@@ -90,7 +90,8 @@ function Perfil() {
                 type="number"
                 min={12}
                 max={95}
-                value={form.edad}
+                value={form.edad || ""}
+                placeholder="Ej. 30"
                 onChange={(e) => set("edad", Number(e.target.value) || 0)}
                 className={inputCls}
               />
@@ -101,6 +102,9 @@ function Perfil() {
                 onChange={(e) => set("tipoSangre", e.target.value)}
                 className={inputCls}
               >
+                <option value="" disabled>
+                  Selecciona tu tipo de sangre
+                </option>
                 {SANGRE.map((s) => (
                   <option key={s}>{s}</option>
                 ))}
@@ -110,7 +114,8 @@ function Perfil() {
               <input
                 type="number"
                 step="0.1"
-                value={form.peso}
+                value={form.peso || ""}
+                placeholder="Ej. 70"
                 onChange={(e) => set("peso", Number(e.target.value) || 0)}
                 className={inputCls}
               />
@@ -119,10 +124,25 @@ function Perfil() {
               <input
                 type="number"
                 step="0.01"
-                value={form.estatura}
+                value={form.estatura || ""}
+                placeholder="Ej. 1.70"
                 onChange={(e) => set("estatura", Number(e.target.value) || 0)}
                 className={inputCls}
               />
+            </Campo>
+            <Campo label="FC en reposo (BPM)">
+              <input
+                type="number"
+                min={30}
+                max={120}
+                value={form.fcReposo || ""}
+                placeholder="Ej. 65"
+                onChange={(e) => set("fcReposo", Number(e.target.value) || 0)}
+                className={inputCls}
+              />
+              <span className="text-[0.75rem] text-ink/55">
+                Tómate el pulso al despertar, en reposo, durante 1 minuto.
+              </span>
             </Campo>
             <Campo label="Nueva contraseña">
               <input
