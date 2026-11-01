@@ -1,3 +1,8 @@
+# Screen responsibilities
+- [x] Separate clinical dashboard KPIs, weekly trends, assistant and recent alerts from live hardware monitoring.
+- [x] Add predominant live pulse, freeze, technical status, simulation and save/export actions without inventing ECG or hardware telemetry.
+- [x] Verify authenticated dashboard and monitoring flows and run relevant tests.
+
 # Requested access security
 - [x] Enforce signup password requirements in the form and registration handler.
 - [x] Add the accepted persistent browser-only failed-login cooldown.
