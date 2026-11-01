@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
-import { CONTEXTOS, estadoDe, type Contexto } from "@/lib/ritmo";
+import { CONTEXTOS, type Contexto } from "@/lib/ritmo";
 import { useSesion } from "@/lib/sesion";
 import { useSintomas } from "@/lib/datos";
 import { useDispositivo } from "@/lib/dispositivo";
@@ -168,8 +168,8 @@ function Sintomas() {
                 ) : (
                   <>
                     <strong className="font-display">{bpm} BPM</strong> ·{" "}
-                    <span className={estadoDe(bpm) === "Normal" ? "text-ok" : "text-warn"}>
-                      {estadoDe(bpm)}
+                    <span className={bpm >= dispositivo.umbralBpm ? "text-warn" : "text-ok"}>
+                      {bpm >= dispositivo.umbralBpm ? "Elevado" : "Normal"}
                     </span>
                   </>
                 )}
