@@ -32,15 +32,14 @@ function Reportes() {
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
   const [aviso, setAviso] = useState("");
-  const [edad, setEdad] = useState("");
-  const [reposo, setReposo] = useState("");
   const [exportando, setExportando] = useState(false);
   const { lista: mediciones } = useMediciones(sesion?.id);
   const { lista: sintomas } = useSintomas(sesion?.id);
 
   if (!sesion) return null;
-  const zonas = edad && reposo ? zonasEntrenamiento(Number(edad), Number(reposo)) : [];
-  const fcMax = edad ? 220 - Number(edad) : null;
+  const tieneDatos = sesion.edad > 0 && sesion.fcReposo > 0;
+  const zonas = tieneDatos ? zonasEntrenamiento(sesion.edad, sesion.fcReposo) : [];
+  const fcMax = sesion.edad > 0 ? 220 - sesion.edad : null;
 
   const exportar = async (formato: "PDF" | "Excel") => {
     if (!desde || !hasta) {
