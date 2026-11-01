@@ -39,6 +39,24 @@ function Inicio() {
       titulo="Bienvenido a RitmoVital"
       migas={[{ label: "Inicio" }]}
     >
+      <Link
+        to="/perfil"
+        className="mt-5 flex flex-col gap-3 rounded-2xl bg-accent px-5 py-4 ring-1 ring-brand/30 transition hover:ring-brand sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="font-display text-lg font-semibold text-ink">
+            Primer paso: completa tu perfil
+          </p>
+          <p className="mt-1 text-base text-ink/70">
+            Registra tu edad, peso, estatura, tipo de sangre y FC en reposo (BPM). Con estos datos
+            tu IMC, tus zonas cardíacas y las respuestas del asistente serán más precisos.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground">
+          Ir a mi perfil →
+        </span>
+      </Link>
+
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <Etiqueta>¿Qué es RitmoVital?</Etiqueta>
