@@ -44,7 +44,9 @@ function Sintomas() {
   // El pulso del registro depende de la fuente elegida.
   const bpmFuente =
     fuentePulso === "manual"
-      ? bpmManual.trim() ? Number(bpmManual) : null
+      ? bpmManual.trim()
+        ? Number(bpmManual)
+        : null
       : fuentePulso === "simulacion"
         ? dispositivo.simulacion
           ? dispositivo.bpm
@@ -71,7 +73,7 @@ function Sintomas() {
           ? "No hay lectura del ESP32. Verifica que el sensor y el servidor local estén encendidos."
           : fuentePulso === "manual"
             ? "Ingresa el pulso de tu registro."
-          : "Activa el modo simulación para tomar el pulso simulado.",
+            : "Activa el modo simulación para tomar el pulso simulado.",
       );
       return;
     }
@@ -95,14 +97,20 @@ function Sintomas() {
     <AppShell
       sesion={sesion}
       titulo="Mapeo y diario de síntomas"
-      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Salud", to: "/salud" }, { label: "Registro de Síntomas" }]}
+      migas={[
+        { label: "Inicio", to: "/inicio" },
+        { label: "Salud", to: "/salud" },
+        { label: "Registro de Síntomas" },
+      ]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <Etiqueta>Nuevo registro</Etiqueta>
           <form onSubmit={guardar} className="mt-4 flex flex-col gap-5">
             <div>
-              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Fuente del pulso</span>
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
+                Fuente del pulso
+              </span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {[
                   ["simulacion", "Modo simulación"],
@@ -189,7 +197,9 @@ function Sintomas() {
             </div>
 
             <div>
-              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Síntomas</span>
+              <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
+                Síntomas
+              </span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SINTOMAS.map((s) => (
                   <button
@@ -232,66 +242,73 @@ function Sintomas() {
           </form>
         </Card>
 
-        <Card className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <Etiqueta>Bitácora reciente</Etiqueta>
-            {bitacora.length > 0 && (
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!window.confirm("¿Borrar toda la bitácora de síntomas?")) return;
-                  try {
-                    await eliminarTodas();
-                  } catch {
-                    setErrorGuardar("No se pudo borrar la bitácora.");
-                  }
-                }}
-                className="rounded-lg bg-destructive/10 px-2.5 py-1.5 text-[0.6875rem] font-medium text-destructive ring-1 ring-destructive/20 hover:bg-destructive/15"
-              >
-                Borrar todo
-              </button>
-            )}
-          </div>
-          {bitacora.length === 0 && (
-            <p className="text-sm text-ink/55">Aún no tienes registros guardados.</p>
-          )}
-          {bitacora.map((r) => (
-            <div key={r.id} className="rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5">
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-display text-sm font-medium">{r.bpm} BPM</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-[0.75rem] text-ink/50">{r.fecha}</span>
-                  <button
-                    type="button"
-                    aria-label={`Borrar registro del ${r.fecha}`}
-                    onClick={async () => {
-                      try {
-                        await eliminar(r.id);
-                      } catch {
-                        setErrorGuardar("No se pudo borrar el registro.");
-                      }
-                    }}
-                    className="grid size-6 place-items-center rounded-md text-[0.6875rem] text-destructive ring-1 ring-destructive/20 hover:bg-destructive/10"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-              <p className="mt-1 text-[0.75rem] text-ink/55">{r.contexto}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {r.sintomas.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-lg bg-panel/70 px-2 py-0.5 text-[0.6875rem] text-ink/60 ring-1 ring-ink/5"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink/65">{r.nota}</p>
+        <div className="relative min-h-0">
+          <Card className="flex flex-col gap-3 lg:absolute lg:inset-0">
+            <div className="flex items-center justify-between gap-3">
+              <Etiqueta>Bitácora reciente</Etiqueta>
+              {bitacora.length > 0 && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!window.confirm("¿Borrar toda la bitácora de síntomas?")) return;
+                    try {
+                      await eliminarTodas();
+                    } catch {
+                      setErrorGuardar("No se pudo borrar la bitácora.");
+                    }
+                  }}
+                  className="rounded-lg bg-destructive/10 px-2.5 py-1.5 text-[0.6875rem] font-medium text-destructive ring-1 ring-destructive/20 hover:bg-destructive/15"
+                >
+                  Borrar todo
+                </button>
+              )}
             </div>
-          ))}
-        </Card>
+            {bitacora.length === 0 && (
+              <p className="text-sm text-ink/55">Aún no tienes registros guardados.</p>
+            )}
+            <div className="rv-scrollbar flex min-h-0 max-h-96 flex-1 flex-col gap-3 overflow-y-auto pr-1 lg:max-h-none">
+              {bitacora.map((r) => (
+                <div
+                  key={r.id}
+                  className="shrink-0 rounded-xl bg-panel/55 px-4 py-3 ring-1 ring-ink/5"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-display text-sm font-medium">{r.bpm} BPM</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[0.75rem] text-ink/50">{r.fecha}</span>
+                      <button
+                        type="button"
+                        aria-label={`Borrar registro del ${r.fecha}`}
+                        onClick={async () => {
+                          try {
+                            await eliminar(r.id);
+                          } catch {
+                            setErrorGuardar("No se pudo borrar el registro.");
+                          }
+                        }}
+                        className="grid size-6 place-items-center rounded-md text-[0.6875rem] text-destructive ring-1 ring-destructive/20 hover:bg-destructive/10"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                  <p className="mt-1 text-[0.75rem] text-ink/55">{r.contexto}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {r.sintomas.map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-lg bg-panel/70 px-2 py-0.5 text-[0.6875rem] text-ink/60 ring-1 ring-ink/5"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink/65">{r.nota}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </section>
     </AppShell>
   );
