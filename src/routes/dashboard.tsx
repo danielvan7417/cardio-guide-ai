@@ -286,12 +286,20 @@ function Dashboard() {
           )}
           {respuesta && (
             <div className="mt-5 border-l-4 border-brand bg-accent/50 p-4 text-sm leading-relaxed">
+              {preguntaGuardada && (
+                <p className="mb-2 text-muted-foreground">
+                  <span className="font-semibold">Tu pregunta:</span> {preguntaGuardada}
+                </p>
+              )}
               {respuesta.alerta_activa && (
                 <p className="mb-2 font-semibold text-alert">
                   Alerta activa · {respuesta.bpm_registrado} BPM
                 </p>
               )}
               <p>{respuesta.respuesta_asistente}</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={limpiarChat}>
+                Nueva consulta
+              </Button>
             </div>
           )}
         </section>
