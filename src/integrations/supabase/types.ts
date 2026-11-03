@@ -56,7 +56,6 @@ export type Database = {
           nombre: string
           peso: number
           tipo_sangre: string
-          umbral_alerta_bpm: number
           updated_at: string
         }
         Insert: {
@@ -70,7 +69,6 @@ export type Database = {
           nombre?: string
           peso?: number
           tipo_sangre?: string
-          umbral_alerta_bpm?: number
           updated_at?: string
         }
         Update: {
@@ -84,7 +82,6 @@ export type Database = {
           nombre?: string
           peso?: number
           tipo_sangre?: string
-          umbral_alerta_bpm?: number
           updated_at?: string
         }
         Relationships: []
