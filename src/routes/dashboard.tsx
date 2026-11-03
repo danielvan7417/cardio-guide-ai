@@ -39,6 +39,28 @@ function Dashboard() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [saludo, setSaludo] = useState("Hola");
+  const [preguntaGuardada, setPreguntaGuardada] = useState("");
+  const claveChat = sesion?.id ? `ritmovital:chat:${sesion.id}` : null;
+  useEffect(() => {
+    if (!claveChat) return;
+    try {
+      const raw = localStorage.getItem(claveChat);
+      if (raw) {
+        const g = JSON.parse(raw) as { pregunta: string; respuesta: RespuestaAsistente };
+        setPreguntaGuardada(g.pregunta ?? "");
+        setRespuesta(g.respuesta ?? null);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [claveChat]);
+  const limpiarChat = () => {
+    if (claveChat) localStorage.removeItem(claveChat);
+    setRespuesta(null);
+    setPreguntaGuardada("");
+    setMensaje("");
+    setError("");
+  };
   useEffect(() => {
     const hour = Number(
       new Intl.DateTimeFormat("es-CO", {
@@ -58,13 +80,17 @@ function Dashboard() {
     setCargando(true);
     setError("");
     try {
-      setRespuesta(
-        await consultarAsistente({
-          imc,
-          bpm: d.enVivo || d.simulacion ? d.bpm : 0,
-          mensaje: mensaje.trim(),
-        }),
-      );
+      const pregunta = mensaje.trim();
+      const r = await consultarAsistente({
+        imc,
+        bpm: d.enVivo || d.simulacion ? d.bpm : 0,
+        mensaje: pregunta,
+      });
+      setRespuesta(r);
+      setPreguntaGuardada(pregunta);
+      setMensaje("");
+      if (claveChat)
+        localStorage.setItem(claveChat, JSON.stringify({ pregunta, respuesta: r }));
     } catch {
       setRespuesta(null);
       setError("No se pudo conectar con la IA local. Comprueba que tu servidor esté encendido.");
@@ -260,12 +286,20 @@ function Dashboard() {
           )}
           {respuesta && (
             <div className="mt-5 border-l-4 border-brand bg-accent/50 p-4 text-sm leading-relaxed">
+              {preguntaGuardada && (
+                <p className="mb-2 text-muted-foreground">
+                  <span className="font-semibold">Tu pregunta:</span> {preguntaGuardada}
+                </p>
+              )}
               {respuesta.alerta_activa && (
                 <p className="mb-2 font-semibold text-alert">
                   Alerta activa · {respuesta.bpm_registrado} BPM
                 </p>
               )}
               <p>{respuesta.respuesta_asistente}</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={limpiarChat}>
+                Nueva consulta
+              </Button>
             </div>
           )}
         </section>
