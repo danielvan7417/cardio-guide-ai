@@ -15,6 +15,13 @@
       "when": 1792281824712,
       "tag": "0001_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793720039490,
+      "tag": "0002_remove_default_biometrics",
+      "breakpoints": true
     }
   ]
 }
