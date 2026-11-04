@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Activity, ArrowRight, Heart, Scale, Wind, MessageCircle, Bell } from "lucide-react";
 import { AppShell, Etiqueta } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -296,7 +297,9 @@ function Dashboard() {
                   Alerta activa · {respuesta.bpm_registrado} BPM
                 </p>
               )}
-              <p>{respuesta.respuesta_asistente}</p>
+              <div className="space-y-2 leading-relaxed text-ink/85 [&_a]:text-brand [&_a]:underline [&_h1]:text-lg [&_h1]:font-semibold [&_h1]:text-ink [&_h2]:font-semibold [&_h2]:text-ink [&_h3]:font-semibold [&_h3]:text-ink [&_li]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_code]:rounded [&_code]:bg-soft [&_code]:px-1">
+                <ReactMarkdown>{respuesta.respuesta_asistente}</ReactMarkdown>
+              </div>
               <Button variant="outline" size="sm" className="mt-3" onClick={limpiarChat}>
                 Nueva consulta
               </Button>
