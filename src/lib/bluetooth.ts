@@ -12,6 +12,13 @@ export function leerPulsoBLE(value: DataView): number | null {
   return bpm > 0 ? bpm : null;
 }
 
+/** SpO₂ viaja como tercer byte del paquete de pulso (extensión del firmware ESP32). */
+export function leerOxigenacionBLE(value: DataView): number | null {
+  if (value.byteLength < 3) return null;
+  const spo2 = value.getUint8(2);
+  return spo2 > 0 && spo2 <= 100 ? spo2 : null;
+}
+
 export interface CaracteristicaBLE extends EventTarget {
   value?: DataView;
   startNotifications(): Promise<CaracteristicaBLE>;
