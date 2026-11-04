@@ -3,6 +3,7 @@ import { UMBRAL_BPM_POR_DEFECTO } from "@/lib/ritmo";
 import {
   bluetoothDisponible,
   leerPulsoBLE,
+  leerOxigenacionBLE,
   SERVICIO_PULSO,
   CARACTERISTICA_PULSO,
   type DispositivoBLE,
@@ -81,7 +82,7 @@ let ultimaLecturaBLE = 0;
 let enviandoBLE = false;
 let generacionBLE = 0;
 
-async function enviarLecturaBLE(bpm: number) {
+async function enviarLecturaBLE(bpm: number, spo2: number | null) {
   if (enviandoBLE) return;
   enviandoBLE = true;
   const generacion = generacionBLE;
@@ -92,6 +93,7 @@ async function enviarLecturaBLE(bpm: number) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         bpm,
+        ...(spo2 !== null ? { spo2 } : {}),
         dispositivo: "ESP32-BLE",
         alerta_activa: bpm >= state.umbralBpm,
         timestamp: new Date().toISOString(),
@@ -116,9 +118,14 @@ function recibirBLE() {
     return;
   }
   ultimaLecturaBLE = Date.now();
-  if (state.simulacion) set({ bpmEsp32: bpm });
-  else empujar(bpm, { estado: "Transmitiendo Live", bpmEsp32: bpm });
-  void enviarLecturaBLE(bpm);
+  const spo2 = leerOxigenacionBLE(value);
+  const extraSpo2: Partial<EstadoStore> =
+    spo2 !== null
+      ? { spo2Esp32: spo2, ultimaOxigenacion: { valor: spo2, recibida: Date.now() } }
+      : {};
+  if (state.simulacion) set({ bpmEsp32: bpm, ...extraSpo2 });
+  else empujar(bpm, { estado: "Transmitiendo Live", bpmEsp32: bpm, ...extraSpo2 });
+  void enviarLecturaBLE(bpm, spo2);
 }
 
 function limpiarBLE() {

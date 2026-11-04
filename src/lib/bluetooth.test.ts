@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { leerPulsoBLE } from "./bluetooth";
+import { leerOxigenacionBLE, leerPulsoBLE } from "./bluetooth";
 
 const trama = (...bytes: number[]) => new DataView(Uint8Array.from(bytes).buffer);
 describe("Lecturas estándar de frecuencia cardíaca BLE", () => {
@@ -14,5 +14,16 @@ describe("Lecturas estándar de frecuencia cardíaca BLE", () => {
     expect(leerPulsoBLE(trama(4, 75))).toBeNull();
     expect(leerPulsoBLE(trama(6, 75))).toBe(75);
     expect(leerPulsoBLE(trama(0, 0))).toBeNull();
+  });
+});
+describe("Oxigenación en el tercer byte del paquete BLE", () => {
+  it("lee el SpO₂ cuando el paquete trae 3 bytes", () => {
+    expect(leerOxigenacionBLE(trama(0, 72, 98))).toBe(98);
+    expect(leerOxigenacionBLE(trama(1, 44, 1, 95))).toBe(95);
+  });
+  it("devuelve null sin tercer byte o con valores inválidos", () => {
+    expect(leerOxigenacionBLE(trama(0, 72))).toBeNull();
+    expect(leerOxigenacionBLE(trama(0, 72, 0))).toBeNull();
+    expect(leerOxigenacionBLE(trama(0, 72, 101))).toBeNull();
   });
 });

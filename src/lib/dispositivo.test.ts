@@ -19,8 +19,9 @@ async function preparar() {
   const fetchMock = vi.fn().mockResolvedValue({ ok: true });
   vi.stubGlobal("fetch", fetchMock);
   const store = await import("./dispositivo");
-  const emitir = (bpm: number) => {
-    characteristic.value = new DataView(Uint8Array.from([0, bpm]).buffer);
+  const emitir = (bpm: number, spo2?: number) => {
+    const bytes = spo2 === undefined ? [0, bpm] : [0, bpm, spo2];
+    characteristic.value = new DataView(Uint8Array.from(bytes).buffer);
     characteristic.dispatchEvent(new Event("characteristicvaluechanged"));
   };
   return { store, emitir, fetchMock, requestDevice, getPrimaryService, getCharacteristic, device };
@@ -60,6 +61,16 @@ describe("Conexión y sincronización ESP32 BLE", () => {
     expect(JSON.parse(request.body).bpm).toBe(70);
     t.store.activarSimulacion(false);
     expect(t.store.useDispositivo()).toMatchObject({ bpm: 70, enVivo: true });
+  });
+  it("lee la oxigenación del paquete y la reenvía a Flask", async () => {
+    const t = await preparar();
+    await t.store.conectarBLE();
+    t.emitir(72, 98);
+    expect(t.store.useDispositivo()).toMatchObject({ bpm: 72, spo2Esp32: 98 });
+    expect(t.store.useDispositivo().ultimaOxigenacion).toMatchObject({ valor: 98 });
+    const request = t.fetchMock.mock.calls[0]?.[1];
+    if (!request) throw new Error("No se envió la lectura");
+    expect(JSON.parse(request.body)).toMatchObject({ bpm: 72, spo2: 98 });
   });
   it("limpia la señal y los listeners al perder el dispositivo", async () => {
     const t = await preparar();
