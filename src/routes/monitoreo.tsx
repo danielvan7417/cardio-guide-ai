@@ -10,6 +10,7 @@ import { IndicadorDispositivo, useDispositivo } from "@/lib/dispositivo";
 import { useMediciones } from "@/lib/datos";
 import { useSesion } from "@/lib/sesion";
 import { fragmentoPulsoCSV, tasaRecepcion } from "@/lib/clinical-summary";
+import { CONTEXTOS, sugerirContexto, type Contexto } from "@/lib/ritmo";
 
 export const Route = createFileRoute("/monitoreo")({
   head: () => ({
@@ -46,6 +47,7 @@ function Monitoreo() {
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState("");
   const [error, setError] = useState(false);
+  const [estadoSel, setEstadoSel] = useState<"auto" | Contexto>("auto");
   if (!sesion) return null;
   const activa = d.enVivo || d.simulacion;
   const fuente = d.simulacion ? "simulacion" : (d.fuente ?? "sin_senal");
@@ -63,14 +65,15 @@ function Monitoreo() {
     setAviso("");
     setError(false);
     const bpm = d.bpm;
+    const ctx = estadoSel === "auto" ? sugerirContexto(bpm, sesion.edad) : estadoSel;
     try {
       await agregar({
         titulo: d.simulacion ? "Toma de simulación" : "Toma actual ESP32",
         bpm,
-        contexto: "Reposo",
+        contexto: ctx,
         origen: d.simulacion ? "simulacion" : d.fuente === "ble" ? "ble" : "esp32",
       });
-      setAviso(`Toma de ${bpm} BPM guardada en Mediciones · contexto Reposo.`);
+      setAviso(`Toma de ${bpm} BPM guardada en Mediciones · contexto ${ctx}.`);
     } catch {
       setError(true);
       setAviso("No se pudo guardar la toma. Inténtalo de nuevo.");
@@ -276,6 +279,27 @@ function Monitoreo() {
         )}
       </section>
       <section aria-label="Acciones de captura" className="py-6">
+        <label className="mb-4 flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-muted-foreground">Tu estado actual:</span>
+          <select
+            value={estadoSel}
+            onChange={(e) => setEstadoSel(e.target.value as "auto" | Contexto)}
+            className="rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+          >
+            <option value="auto">Automático (según edad y BPM)</option>
+            {CONTEXTOS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          {estadoSel === "auto" && activa && (
+            <span className="text-xs text-muted-foreground">
+              Estado probable: <strong>{sugerirContexto(d.bpm, sesion.edad)}</strong>
+              {!sesion.edad && " (completa tu edad en Perfil para afinarlo)"}
+            </span>
+          )}
+        </label>
         <div className="flex flex-wrap gap-3">
           <Button onClick={guardar} disabled={!activa || guardando}>
             <Save />
