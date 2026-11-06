@@ -161,14 +161,14 @@ function Salud() {
           to="/sintomas"
           className="glass group rounded-[20px] p-6 ring-1 ring-ink/5 transition hover:ring-brand/30"
         >
-          <p className="font-display text-lg font-semibold">✚ Registro de Síntomas</p>
+          <p className="font-display text-lg font-semibold">Registro de Síntomas</p>
           <p className="mt-1 text-sm text-ink/60">Anota pulso, contexto, síntomas y notas.</p>
         </Link>
         <Link
           to="/reportes"
           className="glass group rounded-[20px] p-6 ring-1 ring-ink/5 transition hover:ring-brand/30"
         >
-          <p className="font-display text-lg font-semibold">▦ Reportes y Zonas</p>
+          <p className="font-display text-lg font-semibold">Reportes y Zonas</p>
           <p className="mt-1 text-sm text-ink/60">Exporta tu historial en PDF o Excel.</p>
         </Link>
       </section>

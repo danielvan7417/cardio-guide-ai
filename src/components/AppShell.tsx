@@ -1,10 +1,12 @@
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import { Activity, FileText, HeartPulse, Home, List, Menu, Power, Stethoscope, UserRound } from "lucide-react";
 import { cerrarSesion, type Sesion } from "@/lib/sesion";
 import { fijarUmbralAlerta } from "@/lib/dispositivo";
 
-type NavItem = { to: string; label: string; icon: string };
+type NavItem = { to: string; label: string; icon: LucideIcon };
 type Grupo = { titulo: string; to: string; items: NavItem[] };
 
 export const GRUPOS: Grupo[] = [
@@ -12,22 +14,22 @@ export const GRUPOS: Grupo[] = [
     titulo: "Monitoreo",
     to: "/monitoreo",
     items: [
-      { to: "/dashboard", label: "Panel Principal", icon: "◉" },
-      { to: "/mediciones", label: "Mediciones", icon: "▤" },
+      { to: "/dashboard", label: "Panel Principal", icon: Activity },
+      { to: "/mediciones", label: "Mediciones", icon: List },
     ],
   },
   {
     titulo: "Salud",
     to: "/salud",
     items: [
-      { to: "/sintomas", label: "Síntomas", icon: "✚" },
-      { to: "/reportes", label: "Reportes", icon: "▦" },
+      { to: "/sintomas", label: "Síntomas", icon: Stethoscope },
+      { to: "/reportes", label: "Reportes", icon: FileText },
     ],
   },
   {
     titulo: "Configuración",
     to: "/configuracion",
-    items: [{ to: "/perfil", label: "Perfil", icon: "◐" }],
+    items: [{ to: "/perfil", label: "Perfil", icon: UserRound }],
   },
 ];
 
@@ -86,7 +88,7 @@ export function AppShell({
           }`,
         }}
       >
-        <span className="text-[0.8125rem]">⌂</span>
+        <Home className="size-4 shrink-0" />
         {!mini && "Inicio"}
       </Link>
       {GRUPOS.map((g) => (
@@ -121,7 +123,7 @@ export function AppShell({
                 }`,
               }}
             >
-              <span className="text-[0.8125rem]">{item.icon}</span>
+              <item.icon className="size-4 shrink-0" />
               {!mini && item.label}
             </Link>
           ))}
@@ -155,7 +157,7 @@ export function AppShell({
               aria-label={colapsada ? "Expandir menú lateral" : "Contraer menú lateral"}
               className="grid size-9 shrink-0 place-items-center rounded-xl bg-panel/70 text-sm text-ink/70 ring-1 ring-ink/5 transition-colors hover:bg-panel"
             >
-              ☰
+              <Menu className="size-4" />
             </button>
           </div>
           <div className="mt-1">{enlaces(colapsada)}</div>
@@ -166,7 +168,7 @@ export function AppShell({
               aria-label="Cerrar sesión"
               className="mt-auto grid size-9 place-items-center self-center rounded-xl bg-panel/70 text-sm text-ink/70 ring-1 ring-ink/5 hover:bg-panel"
             >
-              ⏻
+              <Power className="size-4" />
             </button>
           ) : (
             <div className="mt-auto rounded-2xl bg-panel/50 p-4 ring-1 ring-ink/5">
@@ -193,7 +195,7 @@ export function AppShell({
               aria-expanded={menuAbierto}
               className="rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/5"
             >
-              ☰ Menú
+              <span className="inline-flex items-center gap-2"><Menu className="size-4" /> Menú</span>
             </button>
           </div>
           {menuAbierto && (
@@ -265,7 +267,7 @@ function Marca() {
   return (
     <div className="flex items-center gap-2.5">
       <div className="grid size-9 place-items-center rounded-[10px] bg-brand/15">
-        <span className="rv-pulse size-2.5 rounded-full bg-brand" />
+        <HeartPulse className="rv-pulse size-5 text-brand" />
       </div>
       <div>
         <p className="font-display text-[0.9375rem] font-semibold">RitmoVital</p>
