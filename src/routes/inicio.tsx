@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { useSesion } from "@/lib/sesion";
+import { Activity, FileText, HeartPulse, List, Stethoscope, UserRound } from "lucide-react";
 
 export const Route = createFileRoute("/inicio")({
   head: () => ({
@@ -25,37 +26,37 @@ export const Route = createFileRoute("/inicio")({
 
 const FUNCIONES = [
   {
-    icono: "◉",
+    icono: Activity,
     titulo: "Panel Principal",
     texto: "Resumen de salud, tendencia semanal, alertas recientes y asistente clínico.",
     to: "/dashboard",
   },
   {
-    icono: "⌁",
+    icono: HeartPulse,
     titulo: "Centro de monitoreo",
     texto: "Pulso en vivo, conexión del ESP32 y controles de adquisición.",
     to: "/monitoreo",
   },
   {
-    icono: "▤",
+    icono: List,
     titulo: "Historial de mediciones",
     texto: "Todas tus lecturas guardadas, filtrables por contexto.",
     to: "/mediciones",
   },
   {
-    icono: "✚",
+    icono: Stethoscope,
     titulo: "Diario de síntomas",
     texto: "Registra pulso, contexto (reposo, ejercicio, estrés), síntomas y notas.",
     to: "/sintomas",
   },
   {
-    icono: "▦",
+    icono: FileText,
     titulo: "Reportes y zonas",
     texto: "Exporta tu historial y calcula tus zonas de entrenamiento cardíaco.",
     to: "/reportes",
   },
   {
-    icono: "◐",
+    icono: UserRound,
     titulo: "Perfil biométrico",
     texto: "Edad, peso, estatura, tipo de sangre y FC en reposo.",
     to: "/perfil",
@@ -122,7 +123,7 @@ function Inicio() {
             className="glass group flex flex-col gap-3 rounded-[20px] p-6 ring-1 ring-ink/5 transition hover:ring-brand/30"
           >
             <span className="grid size-11 place-items-center rounded-xl bg-brand/12 text-lg text-brand">
-              {f.icono}
+              <f.icono className="size-5" />
             </span>
             <p className="font-display text-lg font-semibold">{f.titulo}</p>
             <p className="text-base text-ink/65">{f.texto}</p>
