@@ -53,7 +53,11 @@ function Reportes() {
     setExportando(true);
     const filas: FilaReporte[] = [
       ...mediciones
-        .filter((medicion) => !medicion.createdAt || medicion.createdAt.slice(0, 10) >= desde && medicion.createdAt.slice(0, 10) <= hasta)
+        .filter(
+          (medicion) =>
+            !medicion.createdAt ||
+            (medicion.createdAt.slice(0, 10) >= desde && medicion.createdAt.slice(0, 10) <= hasta),
+        )
         .map((medicion) => ({
           fecha: medicion.fecha,
           tipo: "Medición",
@@ -62,7 +66,11 @@ function Reportes() {
           detalle: medicion.titulo,
         })),
       ...sintomas
-        .filter((registro) => !registro.createdAt || registro.createdAt.slice(0, 10) >= desde && registro.createdAt.slice(0, 10) <= hasta)
+        .filter(
+          (registro) =>
+            !registro.createdAt ||
+            (registro.createdAt.slice(0, 10) >= desde && registro.createdAt.slice(0, 10) <= hasta),
+        )
         .map((registro) => ({
           fecha: registro.fecha,
           tipo: "Síntoma",
@@ -86,7 +94,11 @@ function Reportes() {
     <AppShell
       sesion={sesion}
       titulo="Reportes y zonas de entrenamiento"
-      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Salud", to: "/salud" }, { label: "Reportes y Zonas" }]}
+      migas={[
+        { label: "Inicio", to: "/inicio" },
+        { label: "Salud", to: "/salud" },
+        { label: "Reportes y Zonas" },
+      ]}
     >
       <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-1">
@@ -122,7 +134,7 @@ function Reportes() {
               <button
                 onClick={() => exportar("Excel")}
                 disabled={exportando || !desde || !hasta}
-                className="flex-1 rounded-xl bg-panel/60 px-3 py-2.5 text-sm font-medium text-ink/80 ring-1 ring-ink/10 hover:bg-panel/80"
+                className="flex-1 rounded-xl bg-brand px-3 py-2.5 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Exportar Excel
               </button>
@@ -140,21 +152,26 @@ function Reportes() {
             <div>
               <Etiqueta>Calculadora de zonas</Etiqueta>
               <p className="mt-0.5 text-sm text-ink/60">
-                Frecuencia máxima estimada: <strong className="font-display">{fcMax === null ? "—" : `${fcMax} BPM`}</strong>
+                Frecuencia máxima estimada:{" "}
+                <strong className="font-display">{fcMax === null ? "—" : `${fcMax} BPM`}</strong>
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className="rounded-xl bg-panel/60 px-4 py-2 ring-1 ring-ink/10">
                 <p className="text-[0.75rem] text-ink/55">Edad (perfil)</p>
-                <p className="font-display text-base font-semibold">{sesion.edad > 0 ? `${sesion.edad} años` : "—"}</p>
+                <p className="font-display text-base font-semibold">
+                  {sesion.edad > 0 ? `${sesion.edad} años` : "—"}
+                </p>
               </div>
               <div className="rounded-xl bg-panel/60 px-4 py-2 ring-1 ring-ink/10">
                 <p className="text-[0.75rem] text-ink/55">BPM en reposo (perfil)</p>
-                <p className="font-display text-base font-semibold">{sesion.fcReposo > 0 ? `${sesion.fcReposo} BPM` : "—"}</p>
+                <p className="font-display text-base font-semibold">
+                  {sesion.fcReposo > 0 ? `${sesion.fcReposo} BPM` : "—"}
+                </p>
               </div>
               <Link
                 to="/perfil"
-                className="rounded-xl bg-panel/60 px-4 py-2.5 text-sm font-medium text-ink/80 ring-1 ring-ink/10 hover:bg-panel/80"
+                className="rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Editar perfil
               </Link>
@@ -180,22 +197,22 @@ function Reportes() {
             </div>
           ) : (
             <div className="mt-5 flex flex-col gap-3">
-            {zonas.map((z, i) => (
-              <div key={z.nombre} className="rounded-xl bg-panel/55 p-4 ring-1 ring-ink/5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-display text-sm font-semibold">{z.nombre}</p>
-                  <span className="text-[0.8125rem] text-ink/60">
-                    {z.desde} – {z.hasta} BPM · {z.porcentaje}
-                  </span>
+              {zonas.map((z, i) => (
+                <div key={z.nombre} className="rounded-xl bg-panel/55 p-4 ring-1 ring-ink/5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-display text-sm font-semibold">{z.nombre}</p>
+                    <span className="text-[0.8125rem] text-ink/60">
+                      {z.desde} – {z.hasta} BPM · {z.porcentaje}
+                    </span>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-brand/10">
+                    <div
+                      className={`h-full rounded-full ${i === 3 ? "bg-warn" : "bg-brand"}`}
+                      style={{ width: `${40 + i * 20}%`, opacity: 0.4 + i * 0.2 }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[0.75rem] text-ink/55">{z.descripcion}</p>
                 </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-brand/10">
-                  <div
-                    className={`h-full rounded-full ${i === 3 ? "bg-warn" : "bg-brand"}`}
-                    style={{ width: `${40 + i * 20}%`, opacity: 0.4 + i * 0.2 }}
-                  />
-                </div>
-                <p className="mt-2 text-[0.75rem] text-ink/55">{z.descripcion}</p>
-              </div>
               ))}
             </div>
           )}
