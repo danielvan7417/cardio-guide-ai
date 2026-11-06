@@ -68,6 +68,7 @@ function Perfil() {
     <AppShell
       sesion={sesion}
       titulo="Gestión de perfil"
+      migas={[{ label: "Inicio", to: "/inicio" }, { label: "Perfil" }]}
       volverA={{ label: "Inicio", to: "/inicio" }}
     >
       <form onSubmit={enviar} className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
