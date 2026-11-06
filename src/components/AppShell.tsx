@@ -192,7 +192,7 @@ export function AppShell({
               </p>
               <button
                 onClick={salir}
-                className="mt-3 w-full rounded-lg bg-panel/70 px-3 py-2 text-[0.75rem] font-medium text-ink/70 ring-1 ring-ink/5 hover:bg-panel"
+                className="mt-3 w-full rounded-lg bg-brand px-3 py-2 text-[0.75rem] font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Cerrar sesión
               </button>
@@ -218,7 +218,7 @@ export function AppShell({
               {enlaces()}
               <button
                 onClick={salir}
-                className="mt-2 w-full rounded-lg bg-panel/70 px-3 py-2 text-[0.75rem] font-medium text-ink/70 ring-1 ring-ink/5"
+                className="mt-2 w-full rounded-lg bg-brand px-3 py-2 text-[0.75rem] font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90"
               >
                 Cerrar sesión
               </button>
