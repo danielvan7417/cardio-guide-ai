@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as MedicionesRouteImport } from './routes/mediciones'
@@ -24,11 +23,6 @@ import { Route as SintomasRouteImport } from './routes/sintomas'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfiguracionRoute = ConfiguracionRouteImport.update({
-  id: '/configuracion',
-  path: '/configuracion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -79,7 +73,6 @@ const SintomasRoute = SintomasRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
@@ -92,7 +85,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
@@ -106,7 +98,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/configuracion': typeof ConfiguracionRoute
   '/dashboard': typeof DashboardRoute
   '/inicio': typeof InicioRoute
   '/mediciones': typeof MedicionesRoute
@@ -121,7 +112,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/configuracion'
     | '/dashboard'
     | '/inicio'
     | '/mediciones'
@@ -134,7 +124,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/configuracion'
     | '/dashboard'
     | '/inicio'
     | '/mediciones'
@@ -147,7 +136,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/configuracion'
     | '/dashboard'
     | '/inicio'
     | '/mediciones'
@@ -161,7 +149,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ConfiguracionRoute: typeof ConfiguracionRoute
   DashboardRoute: typeof DashboardRoute
   InicioRoute: typeof InicioRoute
   MedicionesRoute: typeof MedicionesRoute
@@ -180,13 +167,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configuracion': {
-      id: '/configuracion'
-      path: '/configuracion'
-      fullPath: '/configuracion'
-      preLoaderRoute: typeof ConfiguracionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -257,7 +237,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ConfiguracionRoute: ConfiguracionRoute,
   DashboardRoute: DashboardRoute,
   InicioRoute: InicioRoute,
   MedicionesRoute: MedicionesRoute,

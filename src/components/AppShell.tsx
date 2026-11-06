@@ -2,7 +2,17 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Activity, FileText, HeartPulse, Home, List, Menu, Power, Stethoscope, UserRound } from "lucide-react";
+import {
+  Activity,
+  FileText,
+  HeartPulse,
+  Home,
+  List,
+  Menu,
+  Power,
+  Stethoscope,
+  UserRound,
+} from "lucide-react";
 import { cerrarSesion, type Sesion } from "@/lib/sesion";
 import { fijarUmbralAlerta } from "@/lib/dispositivo";
 
@@ -27,8 +37,8 @@ export const GRUPOS: Grupo[] = [
     ],
   },
   {
-    titulo: "Configuración",
-    to: "/configuracion",
+    titulo: "Cuenta",
+    to: "/perfil",
     items: [{ to: "/perfil", label: "Perfil", icon: UserRound }],
   },
 ];
@@ -39,12 +49,14 @@ export function AppShell({
   sesion,
   titulo,
   migas,
+  volverA,
   acciones,
   children,
 }: {
   sesion: Sesion;
   titulo: string;
-  migas: { label: string; to?: string }[];
+  migas?: { label: string; to?: string }[];
+  volverA?: { label: string; to: string };
   acciones?: ReactNode;
   children: ReactNode;
 }) {
@@ -133,9 +145,10 @@ export function AppShell({
   );
 
   // "Volver" sube un nivel en la miga de pan (el último enlace anterior a la página actual).
-  const padre = [...migas.slice(0, -1)].reverse().find((m) => m.to);
+  const padre = [...(migas ?? []).slice(0, -1)].reverse().find((m) => m.to);
+  const destinoVolver = volverA ?? (padre?.to ? { label: padre.label, to: padre.to } : null);
   const volver = () => {
-    if (padre?.to) navigate({ to: padre.to });
+    if (destinoVolver) navigate({ to: destinoVolver.to });
     else router.history.back();
   };
 
@@ -195,7 +208,9 @@ export function AppShell({
               aria-expanded={menuAbierto}
               className="rounded-xl bg-panel/70 px-3 py-2 text-sm ring-1 ring-ink/5"
             >
-              <span className="inline-flex items-center gap-2"><Menu className="size-4" /> Menú</span>
+              <span className="inline-flex items-center gap-2">
+                <Menu className="size-4" /> Menú
+              </span>
             </button>
           </div>
           {menuAbierto && (
@@ -212,28 +227,30 @@ export function AppShell({
 
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <nav
-                aria-label="Ruta de navegación"
-                className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-ink/55"
-              >
-                {migas.map((m, i) => (
-                  <span key={`${m.label}-${i}`} className="flex items-center gap-2">
-                    {m.to ? (
-                      <Link
-                        to={m.to}
-                        className="text-brand transition-colors hover:text-sky-600 hover:underline"
-                      >
-                        {m.label}
-                      </Link>
-                    ) : (
-                      <span className="font-medium text-ink/80" aria-current="page">
-                        {m.label}
-                      </span>
-                    )}
-                    {i < migas.length - 1 && <span className="text-ink/35">/</span>}
-                  </span>
-                ))}
-              </nav>
+              {migas?.length ? (
+                <nav
+                  aria-label="Ruta de navegación"
+                  className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-ink/55"
+                >
+                  {migas.map((m, i) => (
+                    <span key={`${m.label}-${i}`} className="flex items-center gap-2">
+                      {m.to ? (
+                        <Link
+                          to={m.to}
+                          className="text-brand transition-colors hover:text-sky-600 hover:underline"
+                        >
+                          {m.label}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-ink/80" aria-current="page">
+                          {m.label}
+                        </span>
+                      )}
+                      {i < migas.length - 1 && <span className="text-ink/35">/</span>}
+                    </span>
+                  ))}
+                </nav>
+              ) : null}
               <h1 className="mt-1 max-w-[40ch] text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
                 {titulo}
               </h1>
@@ -246,7 +263,7 @@ export function AppShell({
                 className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
               >
                 <span className="text-[0.8125rem]">←</span>{" "}
-                {padre ? `Volver a ${padre.label}` : "Volver"}
+                {destinoVolver ? `Volver a ${destinoVolver.label}` : "Volver"}
               </button>
             </div>
           </header>
