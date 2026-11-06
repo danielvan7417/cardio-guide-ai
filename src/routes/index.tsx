@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Circle } from "lucide-react";
+import { Check, Circle, HeartPulse } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Onda } from "@/components/Onda";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,17 @@ function Login() {
   const [info, setInfo] = useState("");
   const [enviando, setEnviando] = useState(false);
   const inFlight = useRef(false);
+  const nombreRef = useRef<HTMLInputElement>(null);
+  const correoRef = useRef<HTMLInputElement>(null);
+  const claveRef = useRef<HTMLInputElement>(null);
+
+  // En móviles el formulario aparece antes de que la app termine de cargar:
+  // recuperamos lo que el usuario ya alcanzó a escribir para no borrarlo.
+  useEffect(() => {
+    if (nombreRef.current?.value) setNombre(nombreRef.current.value);
+    if (correoRef.current?.value) setCorreo(correoRef.current.value);
+    if (claveRef.current?.value) setClave(claveRef.current.value);
+  }, []);
   const cooldown = useLoginCooldown();
   const register = useServerFn(registerAccount);
   const passwordValid = passwordRequirements.every((rule) => rule.valid(clave));
@@ -129,7 +140,7 @@ function Login() {
         <div className="glass w-full max-w-md rounded-[20px] p-6 ring-1 ring-ink/5 sm:p-8">
           <div className="flex items-center gap-2.5">
             <div className="grid size-9 place-items-center rounded-[10px] bg-brand/15">
-              <span className="rv-pulse size-2.5 rounded-full bg-brand" />
+              <HeartPulse className="rv-pulse size-5 text-brand" />
             </div>
             <div>
               <p className="font-display text-[0.9375rem] font-semibold">RitmoVital</p>
@@ -149,6 +160,7 @@ function Login() {
                   Nombre completo
                 </span>
                 <input
+                  ref={nombreRef}
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
@@ -162,6 +174,8 @@ function Login() {
               </span>
               <input
                 type="email"
+                ref={correoRef}
+                autoComplete="email"
                 value={correo}
                 onChange={(e) => setCorreo(e.target.value)}
                 className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
@@ -173,6 +187,7 @@ function Login() {
                 <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
                 <input
                   type="password"
+                  ref={claveRef}
                   aria-label="Contraseña"
                   value={clave}
                   onChange={(e) => setClave(e.target.value)}
