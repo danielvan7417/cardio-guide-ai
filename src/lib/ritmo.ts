@@ -159,6 +159,7 @@ export const API_URL = "http://127.0.0.1:5000/api/chat";
 export async function consultarAsistente(payload: {
   imc: number;
   bpm: number;
+  edad: number;
   mensaje: string;
 }): Promise<RespuestaAsistente> {
   const res = await fetch(API_URL, {

@@ -85,6 +85,7 @@ function Dashboard() {
       const r = await consultarAsistente({
         imc,
         bpm: d.enVivo || d.simulacion ? d.bpm : 0,
+        edad: sesion.edad ?? 0,
         mensaje: pregunta,
       });
       setRespuesta(r);
