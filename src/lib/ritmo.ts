@@ -33,6 +33,15 @@ export type RegistroSintoma = {
 
 export const UMBRAL_BPM_POR_DEFECTO = 120;
 
+/** Sugiere un contexto probable según el % de la FC máxima (220 − edad). */
+export function sugerirContexto(bpm: number, edad: number): Contexto {
+  const fcMax = 220 - (edad > 0 && edad < 120 ? edad : 30);
+  const pct = bpm / fcMax;
+  if (pct >= 0.6) return "Ejercicio";
+  if (pct >= 0.5) return "Post-ejercicio";
+  return "Reposo";
+}
+
 export const estadoDe = (bpm: number): Estado => (bpm >= 100 ? "Elevado" : "Normal");
 
 export const mediciones: Medicion[] = [
