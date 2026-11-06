@@ -17,7 +17,7 @@ export const Route = createFileRoute("/configuracion")({
       titulo="Configuración"
       seccion="Configuración"
       opciones={[
-        { to: "/perfil", titulo: "Perfil de Usuario", descripcion: "Datos biométricos, contraseña y consentimiento.", icono: "👤" },
+        { to: "/perfil", titulo: "Perfil de Usuario", descripcion: "Datos biométricos, contraseña y consentimiento.", icono: "◐" },
       ]}
     />
   ),
