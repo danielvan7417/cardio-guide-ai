@@ -123,7 +123,7 @@ function Inicio() {
             className="glass group flex flex-col gap-3 rounded-[20px] p-6 ring-1 ring-ink/5 transition hover:ring-brand/30"
           >
             <span className="grid size-11 place-items-center rounded-xl bg-brand/12 text-lg text-brand">
-              <f.icono className="size-4" />
+              <f.icono className="size-5" />
             </span>
             <p className="font-display text-lg font-semibold">{f.titulo}</p>
             <p className="text-base text-ink/65">{f.texto}</p>
