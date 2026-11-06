@@ -1,11 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Circle, HeartPulse } from "lucide-react";
+import { Check, Circle, Eye, EyeOff, HeartPulse } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Onda } from "@/components/Onda";
 import { Button } from "@/components/ui/button";
-import { isInvalidCredentials, MAX_FAILED_LOGINS, passwordRequirements, signupSchema } from "@/lib/access-security";
+import {
+  isInvalidCredentials,
+  MAX_FAILED_LOGINS,
+  passwordRequirements,
+  signupSchema,
+} from "@/lib/access-security";
 import { useLoginCooldown } from "@/lib/use-login-cooldown";
 import { registerAccount } from "@/lib/registration.functions";
 
@@ -36,6 +41,7 @@ function Login() {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
+  const [verClave, setVerClave] = useState(false);
   const [consiente, setConsiente] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -82,15 +88,25 @@ function Login() {
     if (modo === "entrar" && !clave) return setError("Ingresa tu contraseña.");
     if (modo === "registro" && !consiente)
       return setError("Debes aceptar el tratamiento de datos (Ley 1581 de 2012).");
-    const signup = modo === "registro"
-      ? signupSchema.safeParse({ email: correo, password: clave, nombre, consentimiento: consiente })
-      : null;
-    if (signup && !signup.success) return setError(signup.error.issues.map((issue) => issue.message).join(". "));
+    const signup =
+      modo === "registro"
+        ? signupSchema.safeParse({
+            email: correo,
+            password: clave,
+            nombre,
+            consentimiento: consiente,
+          })
+        : null;
+    if (signup && !signup.success)
+      return setError(signup.error.issues.map((issue) => issue.message).join(". "));
     inFlight.current = true;
     setEnviando(true);
     try {
       if (modo === "entrar") {
-        const { error } = await supabase.auth.signInWithPassword({ email: correo.trim(), password: clave });
+        const { error } = await supabase.auth.signInWithPassword({
+          email: correo.trim(),
+          password: clave,
+        });
         if (error) {
           if (isInvalidCredentials(error)) cooldown.fail();
           throw error;
@@ -148,7 +164,9 @@ function Login() {
             </div>
           </div>
 
-          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">{titulos[modo]}</h1>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {titulos[modo]}
+          </h1>
           <p className="mt-1 text-sm text-ink/60">
             Tus datos se guardan de forma segura y cifrada en la nube.
           </p>
@@ -184,28 +202,53 @@ function Login() {
             </label>
             {modo !== "recuperar" && (
               <label className="flex flex-col gap-1.5">
-                <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">Contraseña</span>
-                <input
-                  type="password"
-                  ref={claveRef}
-                  aria-label="Contraseña"
-                  value={clave}
-                  onChange={(e) => setClave(e.target.value)}
-                  autoComplete={modo === "registro" ? "new-password" : "current-password"}
-                  maxLength={modo === "registro" ? 128 : undefined}
-                  aria-describedby={modo === "registro" ? "password-requirements" : undefined}
-                  className="rounded-xl bg-panel/70 px-4 py-3 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
-                  placeholder="••••••••"
-                />
+                <span className="text-[0.75rem] uppercase tracking-[0.14em] text-ink/50">
+                  Contraseña
+                </span>
+                <div className="relative">
+                  <input
+                    type={verClave ? "text" : "password"}
+                    ref={claveRef}
+                    aria-label="Contraseña"
+                    value={clave}
+                    onChange={(e) => setClave(e.target.value)}
+                    autoComplete={modo === "registro" ? "new-password" : "current-password"}
+                    maxLength={modo === "registro" ? 128 : undefined}
+                    aria-describedby={modo === "registro" ? "password-requirements" : undefined}
+                    className="w-full rounded-xl bg-panel/70 py-3 pl-4 pr-11 text-sm ring-1 ring-ink/10 outline-none focus:ring-2 focus:ring-brand"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setVerClave((v) => !v)}
+                    aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-pressed={verClave}
+                    className="absolute inset-y-0 right-0 grid w-11 place-items-center text-ink/55 transition-colors hover:text-ink focus-visible:text-brand focus-visible:outline-none"
+                  >
+                    {verClave ? (
+                      <EyeOff className="size-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 {modo === "registro" && (
                   <ul id="password-requirements" className="mt-1 grid gap-1 text-xs">
                     {passwordRequirements.map((rule) => {
                       const valid = rule.valid(clave);
                       const Icon = valid ? Check : Circle;
-                      return <li key={rule.label} className={`flex items-center gap-2 ${valid ? "text-ok" : "text-ink/60"}`}>
-                        <Icon className="size-3.5 shrink-0" aria-hidden="true" />
-                        <span>{rule.label}{valid ? " — Cumplido" : ""}</span>
-                      </li>;
+                      return (
+                        <li
+                          key={rule.label}
+                          className={`flex items-center gap-2 ${valid ? "text-ok" : "text-ink/60"}`}
+                        >
+                          <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                          <span>
+                            {rule.label}
+                            {valid ? " — Cumplido" : ""}
+                          </span>
+                        </li>
+                      );
                     })}
                   </ul>
                 )}
@@ -224,17 +267,25 @@ function Login() {
             )}
 
             {modo === "entrar" && cooldown.seconds > 0 && (
-              <p role="status" className="rounded-xl bg-warn/10 px-3 py-2 text-[0.8125rem] text-ink ring-1 ring-warn/25">
-                Inicio de sesión bloqueado en este navegador tras 5 intentos fallidos. Podrás intentarlo de nuevo en {cooldown.seconds} s.
+              <p
+                role="status"
+                className="rounded-xl bg-warn/10 px-3 py-2 text-[0.8125rem] text-ink ring-1 ring-warn/25"
+              >
+                Inicio de sesión bloqueado en este navegador tras 5 intentos fallidos. Podrás
+                intentarlo de nuevo en {cooldown.seconds} s.
               </p>
             )}
             {modo === "entrar" && cooldown.seconds === 0 && cooldown.attempts.failures > 0 && (
               <p role="status" className="text-xs text-ink/60">
-                Te quedan {MAX_FAILED_LOGINS - cooldown.attempts.failures} intentos antes del bloqueo de 60 segundos.
+                Te quedan {MAX_FAILED_LOGINS - cooldown.attempts.failures} intentos antes del
+                bloqueo de 60 segundos.
               </p>
             )}
             {error && !(modo === "entrar" && cooldown.seconds > 0) && (
-              <p role="alert" className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20">
+              <p
+                role="alert"
+                className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/20"
+              >
                 {error}
               </p>
             )}
@@ -246,7 +297,12 @@ function Login() {
 
             <Button
               type="submit"
-              disabled={enviando || !cooldown.ready || (modo === "entrar" && cooldown.seconds > 0) || (modo === "registro" && !passwordValid)}
+              disabled={
+                enviando ||
+                !cooldown.ready ||
+                (modo === "entrar" && cooldown.seconds > 0) ||
+                (modo === "registro" && !passwordValid)
+              }
               className="h-auto rounded-xl bg-brand px-4 py-3 text-sm font-medium text-brand-foreground ring-1 ring-brand/40 hover:bg-brand/90 disabled:opacity-60"
             >
               {enviando
@@ -261,15 +317,33 @@ function Login() {
             <div className="flex flex-wrap items-center justify-between gap-2 text-[0.8125rem]">
               {modo === "entrar" ? (
                 <>
-                  <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("recuperar")} className="h-auto p-0 text-brand hover:underline">
+                  <Button
+                    variant="link"
+                    disabled={enviando}
+                    type="button"
+                    onClick={() => cambiarModo("recuperar")}
+                    className="h-auto p-0 text-brand hover:underline"
+                  >
                     ¿Olvidaste tu contraseña?
                   </Button>
-                  <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("registro")} className="h-auto p-0 text-brand hover:underline">
+                  <Button
+                    variant="link"
+                    disabled={enviando}
+                    type="button"
+                    onClick={() => cambiarModo("registro")}
+                    className="h-auto p-0 text-brand hover:underline"
+                  >
                     Crear cuenta
                   </Button>
                 </>
               ) : (
-                <Button variant="link" disabled={enviando} type="button" onClick={() => cambiarModo("entrar")} className="h-auto p-0 text-brand hover:underline">
+                <Button
+                  variant="link"
+                  disabled={enviando}
+                  type="button"
+                  onClick={() => cambiarModo("entrar")}
+                  className="h-auto p-0 text-brand hover:underline"
+                >
                   ← Ya tengo cuenta
                 </Button>
               )}

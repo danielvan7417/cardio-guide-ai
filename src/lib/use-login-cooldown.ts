@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { emptyAttempts, failedLogin, LOGIN_LOCK_KEY, normalizeAttempts, remainingLockSeconds, type LoginAttempts } from "./access-security";
+import {
+  emptyAttempts,
+  failedLogin,
+  LOGIN_LOCK_KEY,
+  normalizeAttempts,
+  remainingLockSeconds,
+  type LoginAttempts,
+} from "./access-security";
 
 export function useLoginCooldown() {
   const fallback = useRef<LoginAttempts>({ ...emptyAttempts });
@@ -9,7 +16,10 @@ export function useLoginCooldown() {
 
   const read = useCallback(() => {
     try {
-      return normalizeAttempts(JSON.parse(localStorage.getItem(LOGIN_LOCK_KEY) || "null"), Date.now());
+      return normalizeAttempts(
+        JSON.parse(sessionStorage.getItem(LOGIN_LOCK_KEY) || "null"),
+        Date.now(),
+      );
     } catch {
       return normalizeAttempts(fallback.current, Date.now());
     }
@@ -17,7 +27,11 @@ export function useLoginCooldown() {
 
   const write = useCallback((state: LoginAttempts) => {
     fallback.current = state;
-    try { localStorage.setItem(LOGIN_LOCK_KEY, JSON.stringify(state)); } catch { /* Keep an in-memory fallback when storage is unavailable. */ }
+    try {
+      sessionStorage.setItem(LOGIN_LOCK_KEY, JSON.stringify(state));
+    } catch {
+      /* sessionStorage may be unavailable */
+    }
     setAttempts(state);
     setSeconds(remainingLockSeconds(state, Date.now()));
   }, []);
@@ -32,13 +46,13 @@ export function useLoginCooldown() {
     };
     sync();
     const interval = window.setInterval(sync, 250);
-    const onStorage = (event: StorageEvent) => { if (event.key === LOGIN_LOCK_KEY || event.key === null) sync(); };
-    window.addEventListener("storage", onStorage);
-    return () => { window.clearInterval(interval); window.removeEventListener("storage", onStorage); };
+    return () => window.clearInterval(interval);
   }, [read]);
 
   return {
-    attempts, seconds, ready,
+    attempts,
+    seconds,
+    ready,
     check: () => remainingLockSeconds(read(), Date.now()),
     fail: () => write(failedLogin(read(), Date.now())),
     reset: () => write({ ...emptyAttempts }),
