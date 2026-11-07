@@ -32,6 +32,7 @@ function Reportes() {
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
   const [aviso, setAviso] = useState("");
+  const [avisoTipo, setAvisoTipo] = useState<"ok" | "error">("ok");
   const [exportando, setExportando] = useState(false);
   const { lista: mediciones } = useMediciones(sesion?.id);
   const { lista: sintomas } = useSintomas(sesion?.id);
@@ -43,10 +44,12 @@ function Reportes() {
 
   const exportar = async (formato: "PDF" | "Excel") => {
     if (!desde || !hasta) {
+      setAvisoTipo("error");
       setAviso("Selecciona las fechas inicial y final del informe.");
       return;
     }
     if (desde > hasta) {
+      setAvisoTipo("error");
       setAviso("La fecha inicial debe ser anterior a la fecha final.");
       return;
     }
@@ -82,8 +85,10 @@ function Reportes() {
     try {
       if (formato === "PDF") exportarPdf(filas, desde, hasta);
       else await exportarExcel(filas, desde, hasta);
+      setAvisoTipo("ok");
       setAviso(`${formato} descargado con ${filas.length} registros.`);
     } catch {
+      setAvisoTipo("error");
       setAviso(`No se pudo generar el archivo ${formato}.`);
     } finally {
       setExportando(false);
@@ -140,7 +145,13 @@ function Reportes() {
               </button>
             </div>
             {aviso && (
-              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/25">
+              <p
+                className={`rounded-xl px-3 py-2 text-[0.8125rem] ring-1 ${
+                  avisoTipo === "ok"
+                    ? "bg-ok/10 text-ok ring-ok/25"
+                    : "bg-destructive/10 text-destructive ring-destructive/25"
+                }`}
+              >
                 {aviso}
               </p>
             )}
