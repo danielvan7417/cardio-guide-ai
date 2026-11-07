@@ -140,7 +140,7 @@ function Reportes() {
               </button>
             </div>
             {aviso && (
-              <p className="rounded-xl bg-ok/10 px-3 py-2 text-[0.8125rem] text-ok ring-1 ring-ok/25">
+              <p className="rounded-xl bg-destructive/10 px-3 py-2 text-[0.8125rem] text-destructive ring-1 ring-destructive/25">
                 {aviso}
               </p>
             )}
