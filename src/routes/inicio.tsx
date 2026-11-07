@@ -94,7 +94,11 @@ function Inicio() {
               </span>
             ))}
           </div>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <p className="mt-6 text-base text-ink/70">
+            <strong className="text-ink">Primer paso:</strong> completa tu perfil (edad, peso,
+            estatura y FC en reposo) para que tu IMC, tus zonas y el asistente sean más precisos.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3">
             <Link to="/monitoreo" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
               Comenzar monitoreo <ArrowRight className="size-4" />
             </Link>
