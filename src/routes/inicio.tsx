@@ -1,13 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { useSesion } from "@/lib/sesion";
-import { Activity, ArrowRight, Bluetooth, BrainCircuit, FileText, HeartPulse, List, ShieldCheck, Stethoscope, UserRound } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  Bluetooth,
+  BrainCircuit,
+  FileText,
+  HeartPulse,
+  List,
+  ShieldCheck,
+  Stethoscope,
+  UserRound,
+} from "lucide-react";
 import corazonHero from "@/assets/corazon-hero.jpg";
 
 const PASOS = [
-  { icono: Bluetooth, titulo: "Conecta", texto: "Vincula tu sensor ESP32 por Bluetooth en un clic." },
-  { icono: HeartPulse, titulo: "Monitorea", texto: "Pulso y oxigenación en vivo, con alertas al instante." },
-  { icono: BrainCircuit, titulo: "Analiza", texto: "El asistente interpreta tus datos con tu edad e IMC." },
+  {
+    icono: Bluetooth,
+    titulo: "Conecta",
+    texto: "Vincula tu sensor ESP32 por Bluetooth en un clic.",
+  },
+  {
+    icono: HeartPulse,
+    titulo: "Monitorea",
+    texto: "Pulso y oxigenación en vivo, con alertas al instante.",
+  },
+  {
+    icono: BrainCircuit,
+    titulo: "Analiza",
+    texto: "El asistente interpreta tus datos con tu edad e IMC.",
+  },
 ] as const;
 
 export const Route = createFileRoute("/inicio")({
@@ -74,7 +97,12 @@ function Inicio() {
   const { sesion } = useSesion();
   if (!sesion) return null;
   return (
-    <AppShell sesion={sesion} titulo="Bienvenido a RitmoVital" migas={[{ label: "Inicio" }]}>
+    <AppShell
+      sesion={sesion}
+      titulo="Bienvenido a RitmoVital"
+      migas={[{ label: "Inicio" }]}
+      sinVolver
+    >
       <section className="glass mt-5 grid items-center gap-6 overflow-hidden rounded-[24px] p-6 ring-1 ring-ink/5 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-brand/12 px-3 py-1 text-sm font-medium text-brand">
@@ -89,7 +117,10 @@ function Inicio() {
               { i: BrainCircuit, t: "IA local" },
               { i: ShieldCheck, t: "Ley 1581" },
             ].map(({ i: I, t }) => (
-              <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5 text-sm text-ink/75 ring-1 ring-ink/10">
+              <span
+                key={t}
+                className="inline-flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5 text-sm text-ink/75 ring-1 ring-ink/10"
+              >
                 <I className="size-4 text-brand" /> {t}
               </span>
             ))}
@@ -99,22 +130,36 @@ function Inicio() {
             estatura y FC en reposo) para que tu IMC, tus zonas y el asistente sean más precisos.
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link to="/monitoreo" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
+            <Link
+              to="/monitoreo"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90"
+            >
               Comenzar monitoreo <ArrowRight className="size-4" />
             </Link>
-            <Link to="/perfil" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
+            <Link
+              to="/perfil"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90"
+            >
               Completar mi perfil
             </Link>
           </div>
         </div>
-        <img src={corazonHero} alt="Corazón de cristal con línea de pulso" width={1024} height={1024} className="mx-auto aspect-square w-full max-w-sm rounded-[20px] object-cover" />
+        <img
+          src={corazonHero}
+          alt="Corazón de cristal con línea de pulso"
+          width={1024}
+          height={1024}
+          className="mx-auto aspect-square w-full max-w-sm rounded-[20px] object-cover"
+        />
       </section>
 
       <h2 className="mt-8 font-display text-xl font-semibold">Cómo funciona</h2>
       <section className="mt-4 grid gap-4 sm:grid-cols-3 sm:gap-5">
         {PASOS.map((p, n) => (
           <div key={p.titulo} className="glass relative rounded-[20px] p-6 ring-1 ring-ink/5">
-            <span className="absolute right-5 top-4 font-display text-4xl font-semibold text-brand/20">{n + 1}</span>
+            <span className="absolute right-5 top-4 font-display text-4xl font-semibold text-brand/20">
+              {n + 1}
+            </span>
             <span className="grid size-12 place-items-center rounded-2xl bg-brand text-brand-foreground">
               <p.icono className="size-6" />
             </span>

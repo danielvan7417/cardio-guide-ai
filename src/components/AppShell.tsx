@@ -51,6 +51,7 @@ export function AppShell({
   migas,
   volverA,
   acciones,
+  sinVolver = false,
   children,
 }: {
   sesion: Sesion;
@@ -58,6 +59,7 @@ export function AppShell({
   migas?: { label: string; to?: string }[];
   volverA?: { label: string; to: string };
   acciones?: ReactNode;
+  sinVolver?: boolean;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -258,13 +260,15 @@ export function AppShell({
             <div className="flex flex-wrap items-center gap-3">
               {acciones}
 
-              <button
-                onClick={volver}
-                className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-              >
-                <span className="text-[0.8125rem]">←</span>{" "}
-                {destinoVolver ? `Volver a ${destinoVolver.label}` : "Volver"}
-              </button>
+              {!sinVolver && (
+                <button
+                  onClick={volver}
+                  className="inline-flex items-center gap-2 rounded-xl bg-sky-500 py-2 pl-3 pr-4 text-sm font-semibold text-white shadow-sm ring-1 ring-sky-400/50 transition-colors hover:bg-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                >
+                  <span className="text-[0.8125rem]">←</span>{" "}
+                  {destinoVolver ? `Volver a ${destinoVolver.label}` : "Volver"}
+                </button>
+              )}
             </div>
           </header>
 
