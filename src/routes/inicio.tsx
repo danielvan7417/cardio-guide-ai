@@ -102,7 +102,7 @@ function Inicio() {
             <Link to="/monitoreo" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
               Comenzar monitoreo <ArrowRight className="size-4" />
             </Link>
-            <Link to="/perfil" className="inline-flex items-center gap-2 rounded-xl bg-panel px-5 py-3 font-medium text-ink ring-1 ring-ink/10 transition hover:ring-brand/40">
+            <Link to="/perfil" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
               Completar mi perfil
             </Link>
           </div>
