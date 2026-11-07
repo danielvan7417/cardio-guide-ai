@@ -32,6 +32,7 @@ function Perfil() {
   const [form, setForm] = useState<Sesion | null>(null);
   const [aviso, setAviso] = useState("");
   const [clave, setClave] = useState("");
+  const [verAvisoFc, setVerAvisoFc] = useState(false);
 
   useEffect(() => setForm(sesion), [sesion]);
   if (!sesion || !form) return null;
@@ -146,13 +147,25 @@ function Perfil() {
                 className={inputCls}
               />
               <span className="text-[0.75rem] text-ink/55">
-                Tómate el pulso al despertar, en reposo, durante 1 minuto. Ten en cuenta que
-                algunas personas presentan valores altos de forma habitual, incluso estando
-                relajadas o recién despiertas, y requieren tratamiento médico. Este valor es solo
-                una referencia: si tu pulso en reposo suele estar elevado o tomas medicación para
-                ello, consulta siempre a tu médico; RitmoVital no sustituye la valoración
-                profesional.
+                Tómate el pulso al despertar, en reposo, durante 1 minuto.{" "}
+                <button
+                  type="button"
+                  onClick={() => setVerAvisoFc((v) => !v)}
+                  aria-expanded={verAvisoFc}
+                  className="inline-flex items-center gap-0.5 rounded-full bg-panel/70 px-2 py-0.5 text-[0.6875rem] font-medium text-brand ring-1 ring-brand/25 transition-colors hover:bg-accent"
+                >
+                  {verAvisoFc ? "Ocultar aviso ▲" : "Ver aviso importante ▼"}
+                </button>
               </span>
+              {verAvisoFc && (
+                <span className="rounded-xl bg-panel/55 px-3 py-2 text-[0.75rem] leading-relaxed text-ink/55 ring-1 ring-ink/5">
+                  Ten en cuenta que algunas personas presentan valores altos de forma habitual,
+                  incluso estando relajadas o recién despiertas, y requieren tratamiento médico.
+                  Este valor es solo una referencia: si tu pulso en reposo suele estar elevado o
+                  tomas medicación para ello, consulta siempre a tu médico; RitmoVital no sustituye
+                  la valoración profesional.
+                </span>
+              )}
             </Campo>
             <Campo label="Límite de alerta de pulso (BPM)">
               <input
