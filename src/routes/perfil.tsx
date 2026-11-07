@@ -146,7 +146,12 @@ function Perfil() {
                 className={inputCls}
               />
               <span className="text-[0.75rem] text-ink/55">
-                Tómate el pulso al despertar, en reposo, durante 1 minuto.
+                Tómate el pulso al despertar, en reposo, durante 1 minuto. Ten en cuenta que
+                algunas personas presentan valores altos de forma habitual, incluso estando
+                relajadas o recién despiertas, y requieren tratamiento médico. Este valor es solo
+                una referencia: si tu pulso en reposo suele estar elevado o tomas medicación para
+                ello, consulta siempre a tu médico; RitmoVital no sustituye la valoración
+                profesional.
               </span>
             </Campo>
             <Campo label="Límite de alerta de pulso (BPM)">
