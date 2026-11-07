@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card, Etiqueta } from "@/components/AppShell";
 import { useSesion } from "@/lib/sesion";
-import { Activity, FileText, HeartPulse, List, Stethoscope, UserRound } from "lucide-react";
+import { Activity, ArrowRight, Bluetooth, BrainCircuit, FileText, HeartPulse, List, ShieldCheck, Stethoscope, UserRound } from "lucide-react";
+import corazonHero from "@/assets/corazon-hero.jpg";
+
+const PASOS = [
+  { icono: Bluetooth, titulo: "Conecta", texto: "Vincula tu sensor ESP32 por Bluetooth en un clic." },
+  { icono: HeartPulse, titulo: "Monitorea", texto: "Pulso y oxigenación en vivo, con alertas al instante." },
+  { icono: BrainCircuit, titulo: "Analiza", texto: "El asistente interpreta tus datos con tu edad e IMC." },
+] as const;
 
 export const Route = createFileRoute("/inicio")({
   head: () => ({
@@ -68,50 +75,49 @@ function Inicio() {
   if (!sesion) return null;
   return (
     <AppShell sesion={sesion} titulo="Bienvenido a RitmoVital" migas={[{ label: "Inicio" }]}>
-      <Link
-        to="/perfil"
-        className="mt-5 flex flex-col gap-3 rounded-2xl bg-accent px-5 py-4 ring-1 ring-brand/30 transition hover:ring-brand sm:flex-row sm:items-center sm:justify-between"
-      >
+      <section className="glass mt-5 grid items-center gap-6 overflow-hidden rounded-[24px] p-6 ring-1 ring-ink/5 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
         <div>
-          <p className="font-display text-lg font-semibold text-ink">
-            Primer paso: completa tu perfil
-          </p>
-          <p className="mt-1 text-base text-ink/70">
-            Registra tu edad, peso, estatura, tipo de sangre y FC en reposo (BPM). Con estos datos
-            tu IMC, tus zonas cardíacas y las respuestas del asistente serán más precisos.
-          </p>
+          <span className="inline-flex items-center gap-2 rounded-full bg-brand/12 px-3 py-1 text-sm font-medium text-brand">
+            <HeartPulse className="size-4" /> Salud cardíaca en tiempo real
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-4xl">
+            Tu corazón, monitoreado y explicado en palabras sencillas.
+          </h2>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {[
+              { i: Bluetooth, t: "Sensor en vivo" },
+              { i: BrainCircuit, t: "IA local" },
+              { i: ShieldCheck, t: "Ley 1581" },
+            ].map(({ i: I, t }) => (
+              <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5 text-sm text-ink/75 ring-1 ring-ink/10">
+                <I className="size-4 text-brand" /> {t}
+              </span>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/monitoreo" className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-medium text-brand-foreground transition hover:opacity-90">
+              Comenzar monitoreo <ArrowRight className="size-4" />
+            </Link>
+            <Link to="/perfil" className="inline-flex items-center gap-2 rounded-xl bg-panel px-5 py-3 font-medium text-ink ring-1 ring-ink/10 transition hover:ring-brand/40">
+              Completar mi perfil
+            </Link>
+          </div>
         </div>
-        <span className="shrink-0 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground">
-          Ir a mi perfil →
-        </span>
-      </Link>
+        <img src={corazonHero} alt="Corazón de cristal con línea de pulso" width={1024} height={1024} className="mx-auto aspect-square w-full max-w-sm rounded-[20px] object-cover" />
+      </section>
 
-      <section className="mt-5 grid gap-4 sm:gap-5 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <Etiqueta>¿Qué es RitmoVital?</Etiqueta>
-          <p className="mt-3 font-display text-2xl font-semibold leading-snug sm:text-3xl">
-            Tu corazón, monitoreado en tiempo real y explicado en palabras sencillas.
-          </p>
-          <p className="mt-4 text-base leading-relaxed text-ink/70">
-            RitmoVital es una plataforma de monitoreo de salud cardíaca. Recibe el pulso desde un
-            sensor físico (ESP32), lo muestra al instante, detecta cuando supera un umbral seguro y
-            te permite consultar a un asistente con inteligencia artificial que corre en tu propio
-            computador, usando tu IMC y tu pulso actual.
-          </p>
-        </Card>
-        <Card>
-          <Etiqueta>En qué se basa</Etiqueta>
-          <ul className="mt-3 flex flex-col gap-3 text-base text-ink/75">
-            <li>• Sensor ESP32 que envía tu pulso en vivo.</li>
-            <li>
-              • Umbral personal: alerta cuando el pulso supera el límite que configuras en tu
-              perfil.
-            </li>
-            <li>• Zonas cardíacas calculadas con tu edad y FC en reposo.</li>
-            <li>• Asistente de IA local: tus consultas no salen de tu equipo.</li>
-            <li>• Datos protegidos según la Ley 1581 de 2012.</li>
-          </ul>
-        </Card>
+      <h2 className="mt-8 font-display text-xl font-semibold">Cómo funciona</h2>
+      <section className="mt-4 grid gap-4 sm:grid-cols-3 sm:gap-5">
+        {PASOS.map((p, n) => (
+          <div key={p.titulo} className="glass relative rounded-[20px] p-6 ring-1 ring-ink/5">
+            <span className="absolute right-5 top-4 font-display text-4xl font-semibold text-brand/20">{n + 1}</span>
+            <span className="grid size-12 place-items-center rounded-2xl bg-brand text-brand-foreground">
+              <p.icono className="size-6" />
+            </span>
+            <p className="mt-4 font-display text-lg font-semibold">{p.titulo}</p>
+            <p className="mt-1 text-base text-ink/65">{p.texto}</p>
+          </div>
+        ))}
       </section>
 
       <h2 className="mt-8 font-display text-xl font-semibold">Lo que encontrarás</h2>
